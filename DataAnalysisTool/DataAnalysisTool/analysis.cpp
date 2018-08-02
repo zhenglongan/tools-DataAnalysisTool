@@ -5,6 +5,9 @@ BYTE rcv_buf[MAX_PACKET_LENGTH];
 
 static volatile RcvState RxState;//通信接收状态
 static volatile unsigned int discard_number;//无法解析的字符数
+static volatile unsigned int correct_master_pocket_number;//正确解析的主机包个数
+static volatile unsigned int correct_slave_pocket_number;//正确解析的从机包个数
+
 
 
 CString *pstrOut; //字符串输出指针，初始化时需要制定
@@ -16,6 +19,9 @@ void analysis_init(CString *pstr)//初始化相关变量
 {
 	RxState = RCV_STATE_HEAD;
 	discard_number = 0;
+	correct_master_pocket_number=0;
+	correct_slave_pocket_number=0;
+
 	pstrOut = pstr;//制定输出字符串变量
 	memset(rcv_buf,0x00,MAX_PACKET_LENGTH);
 }
@@ -180,6 +186,23 @@ void analysis_clear_discard_number(void)//清零无法解析的字符数
 {
 	discard_number=0;
 }
+unsigned int analysis_get_correct_master_pocket_number(void)//获取正确解析的主机包个数
+{
+	return correct_master_pocket_number;
+}
+void analysis_clear_correct_master_pocket_number(void)//清零正确解析的主机包个数
+{
+	correct_master_pocket_number=0;
+}
+unsigned int analysis_get_correct_slave_pocket_number(void)//获取正确解析的从机包个数
+{
+	return correct_slave_pocket_number;
+}
+void analysis_clear_correct_slave_pocket_number(void)//清零正确解析的从机包个数
+{
+	correct_slave_pocket_number=0;
+}
+
 
 void analysis_protocol(BYTE* pcommdata,CString *pstrout)//解析正确的通信帧并输出相应的解析信息
 {
@@ -253,6 +276,7 @@ void analysis_protocol(BYTE* pcommdata,CString *pstrout)//解析正确的通信帧并输出
 		//此处添加解析数据,暂时忽略
 		//......
 
+		correct_master_pocket_number++;//主机正确解析数+1
 
 		//最后添加换行，完成分析并输出
 		*pstrout+=_T("\r\n");
@@ -270,7 +294,7 @@ void analysis_protocol(BYTE* pcommdata,CString *pstrout)//解析正确的通信帧并输出
 		}
 		//此处添加解析数据,暂时忽略
 		//......
-
+		correct_slave_pocket_number++;//从机正确解析数+1
 
 		//最后添加换行，完成分析并输出
 		*pstrout+=_T("\r\n");

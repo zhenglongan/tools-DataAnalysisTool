@@ -474,6 +474,18 @@ void CDataAnalysisToolDlg::OnBnClickedButtonClearData()
 	strtemp.Format(_T("%d"),analysis_get_discard_number());//转换为CString字符串显示
 	m_strEditUncongnizedNumber=_T("未识别数:");
 	m_strEditUncongnizedNumber+=strtemp;
+
+	//正确解析的主机包个数
+	analysis_clear_correct_master_pocket_number();
+	strtemp.Format(_T("%d"),analysis_get_correct_master_pocket_number());//转换为CString字符串显示
+	m_strEditUncongnizedNumber=_T("主机指令:");
+	m_strEditUncongnizedNumber+=strtemp;
+
+	//正确解析的从机包个数
+	analysis_clear_correct_slave_pocket_number();
+	strtemp.Format(_T("%d"),analysis_get_correct_slave_pocket_number());//转换为CString字符串显示
+	m_strEditUncongnizedNumber=_T("从机指令:");
+	m_strEditUncongnizedNumber+=strtemp;
 		
 	//已接收到的正确主机通信包个数
 	strtemp.Format(_T("%d"),0);//转换为CString字符串显示
@@ -527,6 +539,18 @@ void CDataAnalysisToolDlg::OnTimer(UINT_PTR nIDEvent)
 			strtemp.Format(_T("%d"),analysis_get_discard_number());//转换为CString字符串显示
 			m_strEditUncongnizedNumber=_T("未识别数:");
 			m_strEditUncongnizedNumber+=strtemp;
+
+			//正确解析的主机包个数
+			strtemp.Format(_T("%d"),analysis_get_correct_master_pocket_number());//转换为CString字符串显示
+			m_strEditMasterPacketNumber=_T("主机指令:");
+			m_strEditMasterPacketNumber+=strtemp;
+
+			//正确解析的从机包个数
+			strtemp.Format(_T("%d"),analysis_get_correct_slave_pocket_number());//转换为CString字符串显示
+			m_strEditSlavePacketNumber=_T("从机指令:");
+			m_strEditSlavePacketNumber+=strtemp;
+
+
 
 			UpdateData(FALSE);//更新编辑框内容，即在接收显示框中显示接收数据
 			

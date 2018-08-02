@@ -265,8 +265,17 @@ void analysis_protocol(BYTE* pcommdata,CString *pstrout);//½âÎöÕıÈ·µÄÍ¨ĞÅÖ¡²¢Êä³
 
 
 void analysis_init(CString *pstr);//³õÊ¼»¯Ïà¹Ø±äÁ¿£¬ĞèÒªÖÆ¶¨½âÎöÊı¾İÊä³ö×Ö·û´®
+
+
 unsigned int analysis_get_discard_number(void);//»ñÈ¡ÎŞ·¨½âÎöµÄ×Ö·ûÊı
 void analysis_clear_discard_number(void);//ÇåÁãÎŞ·¨½âÎöµÄ×Ö·ûÊı
+
+unsigned int analysis_get_correct_master_pocket_number(void);//»ñÈ¡ÕıÈ·½âÎöµÄÖ÷»ú°ü¸öÊı
+void analysis_clear_correct_master_pocket_number(void);//ÇåÁãÕıÈ·½âÎöµÄÖ÷»ú°ü¸öÊı
+
+unsigned int analysis_get_correct_slave_pocket_number(void);//»ñÈ¡ÕıÈ·½âÎöµÄ´Ó»ú°ü¸öÊı
+void analysis_clear_correct_slave_pocket_number(void);//ÇåÁãÕıÈ·½âÎöµÄ´Ó»ú°ü¸öÊı
+
 
 
 #endif
