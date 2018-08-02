@@ -73,4 +73,8 @@ public:
 	void AutoNextLine(CString strLineText);
 	afx_msg void OnSize(UINT nType, int cx, int cy);
 	CString m_strEditUncongnizedNumber;
+	// 从机接收到的完整通信包个数
+	CString m_strEditSlavePacketNumber;
+	// 接收到的主机完整指令包个数
+	CString m_strEditMasterPacketNumber;
 };

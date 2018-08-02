@@ -19,6 +19,8 @@
 #define IDC_COMBO_BORDRATE              1006
 #define IDC_COMBO_BAUDRATE              1006
 #define IDC_EDIT1                       1007
+#define IDC_EDIT3                       1008
+#define IDC_EDIT4                       1009
 #define IDC_EDIT2                       1010
 #define IDC_STATIC_UNCONGNIZED          1011
 #define ID_32771                        32771

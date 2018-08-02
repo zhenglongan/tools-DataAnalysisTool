@@ -71,6 +71,8 @@ CDataAnalysisToolDlg::CDataAnalysisToolDlg(CWnd* pParent /*=NULL*/)
 	, m_strEditRxNumber(_T(""))
 	, m_RxNumber(0)
 	, m_strEditUncongnizedNumber(_T(""))
+	, m_strEditSlavePacketNumber(_T(""))
+	, m_strEditMasterPacketNumber(_T(""))
 {
 	EnableActiveAccessibility();
 	m_hIcon = AfxGetApp()->LoadIcon(IDR_MAINFRAME);
@@ -98,6 +100,8 @@ void CDataAnalysisToolDlg::DoDataExchange(CDataExchange* pDX)
 	DDX_Text(pDX, IDC_EDIT1, m_strEditRxNumber);
 	DDX_Control(pDX, IDC_EDIT_DATA_DISPLAY, m_ctrlEditDataDisplay);
 	DDX_Text(pDX, IDC_EDIT2, m_strEditUncongnizedNumber);
+	DDX_Text(pDX, IDC_EDIT3, m_strEditSlavePacketNumber);
+	DDX_Text(pDX, IDC_EDIT4, m_strEditMasterPacketNumber);
 }
 
 BEGIN_MESSAGE_MAP(CDataAnalysisToolDlg, CDialog)
@@ -176,6 +180,14 @@ BOOL CDataAnalysisToolDlg::OnInitDialog()
 	strtemp.Format(_T("%d"),0);//转换为CString字符串显示
 	m_strEditUncongnizedNumber=_T("未识别数:");
 	m_strEditUncongnizedNumber+=strtemp;
+
+	strtemp.Format(_T("%d"),0);//转换为CString字符串显示
+	m_strEditMasterPacketNumber=_T("主机指令:");
+	m_strEditMasterPacketNumber+=strtemp;
+
+	strtemp.Format(_T("%d"),0);//转换为CString字符串显示
+	m_strEditSlavePacketNumber=_T("从机指令:");
+	m_strEditSlavePacketNumber+=strtemp;
 
 	UpdateData(FALSE);//更新编辑框内容，即在接收显示框中显示接收数据
 
@@ -462,7 +474,17 @@ void CDataAnalysisToolDlg::OnBnClickedButtonClearData()
 	strtemp.Format(_T("%d"),analysis_get_discard_number());//转换为CString字符串显示
 	m_strEditUncongnizedNumber=_T("未识别数:");
 	m_strEditUncongnizedNumber+=strtemp;
-	
+		
+	//已接收到的正确主机通信包个数
+	strtemp.Format(_T("%d"),0);//转换为CString字符串显示
+	m_strEditMasterPacketNumber=_T("主机指令:");
+	m_strEditMasterPacketNumber+=strtemp;
+
+	//已接收到的正确从机通信包个数
+	strtemp.Format(_T("%d"),0);//转换为CString字符串显示
+	m_strEditSlavePacketNumber=_T("从机指令:");
+	m_strEditSlavePacketNumber+=strtemp;
+
 	//监控窗口
 	m_strEditDisplayData.Empty();
 	UpdateData(FALSE);//更新编辑框内容，即在接收显示框中显示接收数据
@@ -556,13 +578,22 @@ void CDataAnalysisToolDlg::OnSize(UINT nType, int cx, int cy)
 	//串口接收数字符未识别数显示框
 	pWnd=GetDlgItem(IDC_EDIT2); 
 	if(pWnd->GetSafeHwnd()) 
-		pWnd->MoveWindow(cx-280,cy-30,150,30);
+		pWnd->MoveWindow(cx-137-143,cy-30,150,30);
 	
+	//已接收到的正确从机通信包个数显示框
+	pWnd=GetDlgItem(IDC_EDIT3); 
+	if(pWnd->GetSafeHwnd()) 
+		pWnd->MoveWindow(cx-137-143-143,cy-30,150,30);
+
+	//已接收到的正确主机通信包个数显示框
+	pWnd=GetDlgItem(IDC_EDIT4); 
+	if(pWnd->GetSafeHwnd()) 
+		pWnd->MoveWindow(cx-137-143-143-143,cy-30,150,30);
+
 	//串口接收数据清除按钮
 	pWnd=GetDlgItem(IDC_BUTTON_CLEAR_DATA); 
 	if(pWnd->GetSafeHwnd()) 
 		pWnd->MoveWindow(7,cy-50,100,32);
-
 	
 	
 }
