@@ -1,0 +1,29 @@
+// DataAnalysisTool.idl : DataAnalysisTool.exe 的类型库源
+
+// 此文件将由 MIDL 编译器处理以产生
+// 类型库(DataAnalysisTool.tlb)。
+
+[ uuid(7186BCAE-5C6D-4063-8454-C01F124D78D9), version(1.0) ]
+library DataAnalysisTool
+{
+	importlib("stdole32.tlb");
+	importlib("stdole2.tlb");
+
+	//  CDataAnalysisToolDoc 的主调度接口
+	
+	[ uuid(966CD290-A1A0-4BDF-B684-80D49F934D70) ]
+	dispinterface IDataAnalysisTool
+	{
+		properties:
+			
+		methods:
+	};
+
+	//  CDataAnalysisToolDoc 的类信息
+	
+	[ uuid(F4F88504-9F02-484F-94CF-F94B75F1C899) ]
+	coclass DataAnalysisTool
+	{
+		[default] dispinterface IDataAnalysisTool;
+	};
+};
