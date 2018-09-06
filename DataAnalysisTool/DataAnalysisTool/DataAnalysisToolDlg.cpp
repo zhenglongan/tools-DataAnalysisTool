@@ -78,6 +78,7 @@ CDataAnalysisToolDlg::CDataAnalysisToolDlg(CWnd* pParent /*=NULL*/)
 	, m_strEditUncongnizedNumber(_T(""))
 	, m_strEditSlavePacketNumber(_T(""))
 	, m_strEditMasterPacketNumber(_T(""))
+	, strCurrentPortName(_T(""))
 {
 	EnableActiveAccessibility();
 	m_hIcon = AfxGetApp()->LoadIcon(IDR_MAINFRAME);
@@ -121,6 +122,9 @@ BEGIN_MESSAGE_MAP(CDataAnalysisToolDlg, CDialog)
 	ON_BN_CLICKED(IDC_BUTTON_CLEAR_DATA, &CDataAnalysisToolDlg::OnBnClickedButtonClearData)
 	ON_WM_TIMER()
 	ON_WM_SIZE()
+	ON_WM_DEVICECHANGE()
+	ON_CBN_SELCHANGE(IDC_COMBO_PORT, &CDataAnalysisToolDlg::OnCbnSelchangeComboPort)
+	ON_CBN_SELCHANGE(IDC_COMBO_BAUDRATE, &CDataAnalysisToolDlg::OnCbnSelchangeComboBaudrate)
 END_MESSAGE_MAP()
 
 
@@ -164,7 +168,7 @@ BOOL CDataAnalysisToolDlg::OnInitDialog()
 	//m_nPort=1;//默认选择COM1
 	GetCom();//获取可用串口
 	m_ctrlComboCommBaudRate.SetCurSel(9);//波特率默认选择115200
-	m_ctrlComm.put_CommPort(m_nPort);
+	//m_ctrlComm.put_CommPort(m_nPort);
 	OpenPortStatus=FALSE;
 	if(m_ctrlComm.get_PortOpen())
 	{
@@ -384,7 +388,9 @@ void CDataAnalysisToolDlg::OnBnClickedButtonOpen()
 			m_ctrlButtonClosePort.EnableWindow(m_ctrlComm.get_PortOpen());//按照串口标志位，置“打开串口”、“关闭串口”有效或者无效
 			m_ctrlButtonOpenPort.EnableWindow(!m_ctrlComm.get_PortOpen());
 			OpenPortStatus=TRUE;
-			MessageBox(_T("所选串口成功打开"),_T("打开成功"));
+			//获取当前选中的串口设备名称
+			m_ctrlComboCommPort.GetLBText(m_ctrlComboCommPort.GetCurSel(),strCurrentPortName);
+			//MessageBox(_T("所选串口成功打开"),_T("打开成功"));
 
 		}
 		else
@@ -411,7 +417,9 @@ void CDataAnalysisToolDlg::OnBnClickedButtonClose()
 			OpenPortStatus=FALSE;
 			m_ctrlButtonClosePort.EnableWindow(OpenPortStatus);//按照串口标志位，置“打开串口”、“关闭串口”有效或者无效
 			m_ctrlButtonOpenPort.EnableWindow(!OpenPortStatus);
-			MessageBox(_T("所选串口成功关闭"),_T("打开成功"));
+			//清空当前选中的串口设备名称
+			strCurrentPortName.Empty();
+			//MessageBox(_T("所选串口成功关闭"),_T("打开成功"));
 		}
 		else
 		{
@@ -657,7 +665,7 @@ void CDataAnalysisToolDlg::UpdateEditDisplay(void)
 
 }
 
-// 获取当前可用串口号
+// 获取PC当前可用的所有串口号（获取串口名字，然后从名字中计算出串口号，COM18的串口号是18
 void CDataAnalysisToolDlg::GetCom(void)
 {
 	////程序启动时获取全部可用串口
@@ -738,13 +746,16 @@ void CDataAnalysisToolDlg::GetCom(void)
 	CString strTemp;
 
 	// Populate the list of serial ports.
-	EnumSerialPorts(asi,FALSE/*include all*/);
+	EnumSerialPorts(asi,FALSE/*include all*/);//只能获取名字，而不能获取端口号
 	m_ctrlComboCommPort.ResetContent();
+	//自己挨个计算出端口号
 	for (int ii=0; ii<asi.GetSize(); ii++) 
 	{
+		//查找第一个"COM"字符串出现的地方
 		dTemp=asi[ii].strFriendlyName.Find(_T("COM"));
 		if(dTemp>0)//find successed!
 		{
+			//后面的两位数字为串口号，目前暂时不支持COM99以上，因为这种情况几乎不会出现
 			if(asi[ii].strFriendlyName[dTemp+3]>='0' && asi[ii].strFriendlyName[dTemp+3]<='9')
 			{
 				if(asi[ii].strFriendlyName[dTemp+4]>='0' && asi[ii].strFriendlyName[dTemp+4]<='9')
@@ -756,7 +767,6 @@ void CDataAnalysisToolDlg::GetCom(void)
 				{
 					asi[ii].cComNum=asi[ii].strFriendlyName[dTemp+3]-'0';
 				}
-
 			}
 			else
 			{
@@ -772,13 +782,14 @@ void CDataAnalysisToolDlg::GetCom(void)
 		//m_ctrlComboCommPort.AddString(asi[ii].strDevPath);
 		//m_ctrlComboCommPort.AddString(asi[ii].strPortDesc);
 	}
+	//重置选择框的宽度，这样不会显示不全
 	ResetCtrlWidth(&m_ctrlComboCommPort);// reset combobox width
 	if(asi.GetSize())
 	{
 		m_ctrlComboCommPort.SetCurSel(0);
 	}
 }
-// reset combobox width
+//重置选择框的宽度，这样不会显示不全
 void CDataAnalysisToolDlg::ResetCtrlWidth(CComboBox* lpCtrl)
 {
 	CString str;  
@@ -798,4 +809,220 @@ void CDataAnalysisToolDlg::ResetCtrlWidth(CComboBox* lpCtrl)
 	lpCtrl->SetDroppedWidth(dx+24);  
 	pDC->SelectObject(pOldFont);  
 	lpCtrl->ReleaseDC(pDC); 
+}
+//当有设备拔出或者有新设备插入PC中将进入此函数
+BOOL CDataAnalysisToolDlg::OnDeviceChange(UINT nEventType, DWORD dwData)
+{
+	CString str;
+	BYTE result=0;
+	//str.Format(_T("设备出现变化，nEventType=%d,dwData=%d."),nEventType,dwData);
+	//AfxMessageBox(str);
+	switch (nEventType)//查看设备变化的具体类型
+	{  
+		case 0x8004/*DBT_DEVICEREMOVECOMPLETE*/://移除设备
+			GetCom();//重新扫描串口
+			if(OpenPortStatus==TRUE)//如果串口已经打开
+			{
+				if(m_ctrlComboCommPort.GetCount()==0)//已经没有可用的串口设备了
+				{
+					str=_T("当前使用的端口： ");
+					str+=strCurrentPortName;
+					str+=_T("\r\n已经被拔出！监控停止！");
+					MessageBox(str,_T("警告！"),MB_ICONSTOP);
+					OnBnClickedButtonClose();//关闭串口
+				}
+				else//
+				{
+				
+					for(int i=0;i<m_ctrlComboCommPort.GetCount();i++)
+					{
+						//之前打开的串口还在，那么重新选中此项
+						if(strCurrentPortName==asi[i].strFriendlyName)
+						{
+							m_ctrlComboCommPort.SetCurSel(i);
+							result=1;
+							break;
+						}
+						else
+						{
+						}
+					}
+					//之前打开的串口已经没有了
+					if(result==0)
+					{
+						str=_T("当前使用的端口： ");
+						str+=strCurrentPortName;
+						str+=_T("\r\n已经被拔出！监控停止！");
+						MessageBox(str,_T("警告！"),MB_ICONSTOP);
+						OnBnClickedButtonClose();//关闭串口
+					}
+				}
+			}
+			//AfxMessageBox(_T("设备移除，重新扫描串口"));
+			break;
+		case 0x8000/*DBT_DEVICEREMOVECOMPLETE*/://增加设备
+			GetCom();//重新扫描串口
+			if(OpenPortStatus==TRUE)//如果串口已经打开
+			{
+				for(int i=0;i<m_ctrlComboCommPort.GetCount();i++)
+				{
+					//之前打开的串口还在，那么重新选中此项
+					if(strCurrentPortName==asi[i].strFriendlyName)
+					{
+						m_ctrlComboCommPort.SetCurSel(i);
+						result=1;
+						break;
+					}
+					else
+					{
+					}
+				}
+			}
+			//AfxMessageBox(_T("设备新增，重新扫描串口"));
+			break;
+
+		default:
+			break;
+	}
+	return TRUE; 
+}
+//当串口选择更改后将进入此函数
+void CDataAnalysisToolDlg::OnCbnSelchangeComboPort()
+{
+	// TODO: Add your control notification handler code here
+	CString str;
+
+	//AfxMessageBox(_T("选择的端口号改变了"));
+
+	if(OpenPortStatus==TRUE)//如果串口已经打开
+	{
+		//获取当前选中的串口设备名称
+		m_ctrlComboCommPort.GetLBText(m_ctrlComboCommPort.GetCurSel(),str);
+		if(strCurrentPortName!=str)
+		{
+			for(int i=0;i<m_ctrlComboCommPort.GetCount();i++)
+			{
+				//重新选中之前的串口号
+				if(strCurrentPortName==asi[i].strFriendlyName)
+				{
+					m_ctrlComboCommPort.SetCurSel(i);
+					break;
+				}
+				else
+				{
+				}
+			}
+			str=_T("请先关闭当前端口： ");
+			str+=strCurrentPortName;
+			str+=_T("\r\n后再选择其他端口！");
+			MessageBox(str,_T("提示"),MB_ICONINFORMATION);
+			//AfxMessageBox(_T("请先关闭当前端口后再选择其他端口！"));
+		}
+	}
+}
+//当波特率选择更改后将进入此函数
+void CDataAnalysisToolDlg::OnCbnSelchangeComboBaudrate()
+{
+// TODO: Add your control notification handler code here
+	unsigned int BoadRate;
+	BYTE i;
+	CString str;
+
+	if(OpenPortStatus==TRUE)//如果串口已经打开
+	{
+		switch(m_ctrlComboCommBaudRate.GetCurSel())//根据选择设置波特率
+		{
+			case 0:
+				BoadRate=1200;
+				break;
+			case 1:
+				BoadRate=2400;
+				break;
+			case 2:
+				BoadRate=4800;
+				break;
+			case 3:
+				BoadRate=9600;
+				break;
+			case 4:
+				BoadRate=14400;
+				break;
+			case 5:
+				BoadRate=19200;
+				break;
+			case 6:
+				BoadRate=28800;
+				break;
+			case 7:
+				BoadRate=38400;
+				break;
+			case 8:
+				BoadRate=57600;
+				break;
+			case 9:
+				BoadRate=115200;
+				break;
+			case 10:
+				BoadRate=230400;
+				break;
+			case 11:
+				BoadRate=256000;
+				break;
+			default:
+				BoadRate=115200;
+				break;
+		}
+
+		if(m_nBaudRate!=BoadRate)
+		{
+			switch(m_nBaudRate)//根据选择设置波特率
+			{
+				case 1200:
+					i=0;
+					break;
+				case 2400:
+					i=1;
+					break;
+				case 4800:
+					i=2;
+					break;
+				case 9600:
+					i=3;
+					break;
+				case 14400:
+					i=4;
+					break;
+				case 19200:
+					i=5;
+					break;
+				case 28800:
+					i=6;
+					break;
+				case 38400:
+					i=7;
+					break;
+				case 57600:
+					i=8;
+					break;
+				case 115200:
+					i=9;
+					break;
+				case 230400:
+					i=10;
+					break;
+				case 256000:
+					i=11;
+					break;
+				default:
+					i=0;
+					break;
+			}
+			m_ctrlComboCommBaudRate.SetCurSel(i);
+
+			str=_T("请先关闭当前端口： ");
+			str+=strCurrentPortName;
+			str+=_T("\r\n后再更改波特率！");
+			MessageBox(str,_T("提示"),MB_ICONINFORMATION);
+		}
+	}
 }

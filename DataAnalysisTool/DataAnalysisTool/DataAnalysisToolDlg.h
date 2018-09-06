@@ -83,4 +83,9 @@ public:
 	void GetCom(void);
 	// reset combobox width
 	void ResetCtrlWidth(CComboBox* lpCtrl);
+	afx_msg BOOL OnDeviceChange(UINT nEventType, DWORD dwData);
+	// 当前选中的串口名字
+	CString strCurrentPortName;
+	afx_msg void OnCbnSelchangeComboPort();
+	afx_msg void OnCbnSelchangeComboBaudrate();
 };
