@@ -69,6 +69,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				RegisterOutput="true"
+				AdditionalDependencies="setupapi.lib"
 				LinkIncremental="2"
 				GenerateDebugInformation="true"
 				SubSystem="2"
@@ -214,6 +215,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\EnumSerial.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\mscomm1.cpp"
 				>
 			</File>
@@ -236,6 +241,10 @@
 						UsePrecompiledHeader="1"
 					/>
 				</FileConfiguration>
+			</File>
+			<File
+				RelativePath=".\zhongjie_mbj_info.cpp"
+				>
 			</File>
 		</Filter>
 		<Filter
@@ -260,6 +269,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\EnumSerial.h"
+				>
+			</File>
+			<File
 				RelativePath=".\mscomm1.h"
 				>
 			</File>
@@ -273,6 +286,10 @@
 			</File>
 			<File
 				RelativePath=".\targetver.h"
+				>
+			</File>
+			<File
+				RelativePath=".\zhongjie_mbj_info.h"
 				>
 			</File>
 		</Filter>
