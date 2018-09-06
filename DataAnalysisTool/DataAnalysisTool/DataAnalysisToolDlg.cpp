@@ -162,7 +162,7 @@ BOOL CDataAnalysisToolDlg::OnInitDialog()
 
 	// TODO: 在此添加额外的初始化代码
 	//↓↓↓↓↓↓↓↓↓↓↓↓↓以下是我们自己添加的程序↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓
-	
+	OpenPortStatus=FALSE;
 	//串口初始化
 	//m_ctrlComboCommPort.SetCurSel(5);//串口选择框默认选择COM1
 	//m_nPort=1;//默认选择COM1
@@ -385,21 +385,23 @@ void CDataAnalysisToolDlg::OnBnClickedButtonOpen()
 		m_ctrlComm.put_InBufferCount(0);//清空接收缓冲区，即清除接收缓冲区中的残留数据
 		if(m_ctrlComm.get_PortOpen())
 		{		
-			m_ctrlButtonClosePort.EnableWindow(m_ctrlComm.get_PortOpen());//按照串口标志位，置“打开串口”、“关闭串口”有效或者无效
-			m_ctrlButtonOpenPort.EnableWindow(!m_ctrlComm.get_PortOpen());
+			//m_ctrlButtonClosePort.EnableWindow(m_ctrlComm.get_PortOpen());//按照串口标志位，置“打开串口”、“关闭串口”有效或者无效
+			//m_ctrlButtonOpenPort.EnableWindow(!m_ctrlComm.get_PortOpen());
 			OpenPortStatus=TRUE;
 			//获取当前选中的串口设备名称
 			m_ctrlComboCommPort.GetLBText(m_ctrlComboCommPort.GetCurSel(),strCurrentPortName);
 			//MessageBox(_T("所选串口成功打开"),_T("打开成功"));
-
+			m_ctrlButtonOpenPort.SetWindowText(_T("停止监听"));//把按钮变为关闭串口
 		}
 		else
 		{
 			OpenPortStatus=FALSE;
 			MessageBox(_T("串口无法打开或已被占用"),_T("串口打开失败"));
 		}
-
-
+	}
+	else
+	{
+		OnBnClickedButtonClose();
 	}
 
 //↑↑↑↑↑↑↑↑↑↑↑↑↑以下是我们自己添加的程序↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑
@@ -415,11 +417,13 @@ void CDataAnalysisToolDlg::OnBnClickedButtonClose()
 		if(!m_ctrlComm.get_PortOpen())
 		{
 			OpenPortStatus=FALSE;
-			m_ctrlButtonClosePort.EnableWindow(OpenPortStatus);//按照串口标志位，置“打开串口”、“关闭串口”有效或者无效
-			m_ctrlButtonOpenPort.EnableWindow(!OpenPortStatus);
+			//m_ctrlButtonClosePort.EnableWindow(OpenPortStatus);//按照串口标志位，置“打开串口”、“关闭串口”有效或者无效
+			//m_ctrlButtonOpenPort.EnableWindow(!OpenPortStatus);
 			//清空当前选中的串口设备名称
 			strCurrentPortName.Empty();
 			//MessageBox(_T("所选串口成功关闭"),_T("打开成功"));
+			m_ctrlButtonOpenPort.SetWindowText(_T("开始监听"));//把按钮变为关闭串口
+
 		}
 		else
 		{
