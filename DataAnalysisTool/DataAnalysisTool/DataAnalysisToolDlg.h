@@ -92,4 +92,7 @@ public:
 	CStatic m_pictrueControlSystemStatus;
 	// 显示系统状态图片
 	void ShowSystemStatusPicture(DWORD bitmap);
+
+	HACCEL hAccel;//快捷键
+	virtual BOOL PreTranslateMessage(MSG* pMsg);
 };

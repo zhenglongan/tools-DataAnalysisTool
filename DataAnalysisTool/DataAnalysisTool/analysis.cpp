@@ -270,7 +270,7 @@ void analysis_protocol(BYTE* pcommdata,CString *pstrout)//解析正确的通信帧并输出
 		*pstrout+=_T(" Master-->");//首先显示时间和头部信息
 
 		//发送花样的时候，程序卡死在这里，因为i定义成乐BYTE，但是len+2已经大于255了
-		//所以这里成了死循环，最后修改i为unsigned int型就解决问题了
+		//所以这里成了死循环，最后修改i为unsigned int型就解决问题了-2018-9-18
 		for(i=0;i<len+2;i++)//原文粘贴数据
 		{
 			strtemp.Format(_T(" %02X"), rcv_buf[i]);

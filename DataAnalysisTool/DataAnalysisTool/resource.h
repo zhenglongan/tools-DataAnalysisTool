@@ -14,6 +14,7 @@
 #define IDI_ICON2                       135
 #define IDB_BITMAP1                     136
 #define IDB_BITMAP2                     139
+#define IDR_ACCELERATOR1                140
 #define IDC_MSCOMM1                     1000
 #define IDC_COMBO_PORT                  1001
 #define IDC_BUTTON_OPEN                 1002
@@ -32,13 +33,14 @@
 #define ID_32772                        32772
 #define ID_Menu                         32773
 #define ID_about                        32774
+#define ID_ACCELERATOR32779             32779
 
 // Next default values for new objects
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        140
-#define _APS_NEXT_COMMAND_VALUE         32775
+#define _APS_NEXT_RESOURCE_VALUE        142
+#define _APS_NEXT_COMMAND_VALUE         32781
 #define _APS_NEXT_CONTROL_VALUE         1013
 #define _APS_NEXT_SYMED_VALUE           101
 #endif

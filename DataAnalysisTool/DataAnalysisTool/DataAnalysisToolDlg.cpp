@@ -163,7 +163,12 @@ BOOL CDataAnalysisToolDlg::OnInitDialog()
 
 	// TODO: 在此添加额外的初始化代码
 	//↓↓↓↓↓↓↓↓↓↓↓↓↓以下是我们自己添加的程序↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓
-	
+	//添加F5作为打开或者关闭监控按钮的快捷键
+	//这是因为接受数据的时候，刷新太快，鼠标按下关闭监控总是没有反应，这样改成
+	//F5以后就可以立即反应过来了，2018-9-18
+	hAccel=::LoadAccelerators(AfxGetInstanceHandle(),MAKEINTRESOURCE(IDR_ACCELERATOR1));//添加快捷键到监控按钮
+
+
 	ShowSystemStatusPicture(IDB_BITMAP1);//IDB_BITMAP1
 
 	OpenPortStatus=FALSE;
@@ -212,7 +217,7 @@ BOOL CDataAnalysisToolDlg::OnInitDialog()
 	display_new_line.Empty();
 	analysis_init(&display_new_line);//初始化协议解析模块
 	//↑↑↑↑↑↑↑↑↑↑↑↑↑以下是我们自己添加的程序↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑
-
+	
 
 
 
@@ -400,7 +405,7 @@ void CDataAnalysisToolDlg::OnBnClickedButtonOpen()
 			//获取当前选中的串口设备名称
 			m_ctrlComboCommPort.GetLBText(m_ctrlComboCommPort.GetCurSel(),strCurrentPortName);
 			//MessageBox(_T("所选串口成功打开"),_T("打开成功"));
-			m_ctrlButtonOpenPort.SetWindowText(_T("停止监听"));//把按钮变为关闭串口
+			m_ctrlButtonOpenPort.SetWindowText(_T("停止监听F5"));//把按钮变为关闭串口
 		}
 		else
 		{
@@ -433,7 +438,7 @@ void CDataAnalysisToolDlg::OnBnClickedButtonClose()
 			//清空当前选中的串口设备名称
 			strCurrentPortName.Empty();
 			//MessageBox(_T("所选串口成功关闭"),_T("打开成功"));
-			m_ctrlButtonOpenPort.SetWindowText(_T("开始监听"));//把按钮变为关闭串口
+			m_ctrlButtonOpenPort.SetWindowText(_T("开始监听F5"));//把按钮变为关闭串口
 
 		}
 		else
@@ -1125,4 +1130,14 @@ void CDataAnalysisToolDlg::ShowSystemStatusPicture(DWORD bitmap1)
     pDC->StretchBlt(0, 0,rect.Width(),rect.Height(),&dcMemory,0, 0, bmpInfo.bmWidth, bmpInfo.bmHeight,SRCCOPY); 
     dcMemory.SelectObject(pOldBitmap); 
     ReleaseDC(pDC); 
+}
+
+BOOL CDataAnalysisToolDlg::PreTranslateMessage(MSG* pMsg)
+{
+	// TODO: Add your specialized code here and/or call the base class
+	if(::TranslateAccelerator(GetSafeHwnd(),hAccel,pMsg))
+		return true;
+	
+
+	return CDialog::PreTranslateMessage(pMsg);
 }
