@@ -239,7 +239,7 @@
 //};
 #define MAX_PACKET_LENGTH 300
 
-extern BYTE rcv_buf[];//缓存解析完成的通信数据
+extern BYTE rcv_buf[MAX_PACKET_LENGTH];//缓存解析完成的通信数据
 
 typedef enum	//通信包接收状态
 {

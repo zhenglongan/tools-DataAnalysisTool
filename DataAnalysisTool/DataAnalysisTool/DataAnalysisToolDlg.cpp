@@ -15,8 +15,8 @@
 #endif
 
 //我的全局变量
-CircularBuf circular_buf(10*1024);//定义缓存缓冲区，大小为64KB
-BYTE display_buf[10*1024];//用于缓存显示
+CircularBuf circular_buf(16*1024);//定义缓存缓冲区，大小为16KB
+BYTE display_buf[16*1024];//用于缓存显示
 CString display_new_line;
 
 CArray<SSerInfo,SSerInfo&> asi;
@@ -24,8 +24,8 @@ CArray<SSerInfo,SSerInfo&> asi;
 
 #define TIMER_READ_PORT_DATA 1
 
-
-
+HBITMAP hBmpx;
+HBITMAP hold;
 
 
 // 用于应用程序“关于”菜单项的 CAboutDlg 对话框
@@ -108,6 +108,7 @@ void CDataAnalysisToolDlg::DoDataExchange(CDataExchange* pDX)
 	DDX_Text(pDX, IDC_EDIT2, m_strEditUncongnizedNumber);
 	DDX_Text(pDX, IDC_EDIT3, m_strEditSlavePacketNumber);
 	DDX_Text(pDX, IDC_EDIT4, m_strEditMasterPacketNumber);
+	DDX_Control(pDX, IDC_STATIC_STATE, m_pictrueControlSystemStatus);
 }
 
 BEGIN_MESSAGE_MAP(CDataAnalysisToolDlg, CDialog)
@@ -162,6 +163,9 @@ BOOL CDataAnalysisToolDlg::OnInitDialog()
 
 	// TODO: 在此添加额外的初始化代码
 	//↓↓↓↓↓↓↓↓↓↓↓↓↓以下是我们自己添加的程序↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓
+	
+	ShowSystemStatusPicture(IDB_BITMAP1);//IDB_BITMAP1
+
 	OpenPortStatus=FALSE;
 	//串口初始化
 	//m_ctrlComboCommPort.SetCurSel(5);//串口选择框默认选择COM1
@@ -321,13 +325,16 @@ void CDataAnalysisToolDlg::OnBnClickedButtonOpen()
 	//↓↓↓↓↓↓↓↓↓↓↓↓↓以下是我们自己添加的程序↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓
 	CString strTemp;
 
+	
+
 	if(OpenPortStatus==FALSE)//如果串口未打开，执行下列内容
 	{
+		ShowSystemStatusPicture(IDB_BITMAP2);
 		m_nPort=asi[m_ctrlComboCommPort.GetCurSel()].cComNum;//获得组合框中的串口号
 
 		m_ctrlComm.put_CommPort(m_nPort);//选择相应串口
 		m_ctrlComm.put_InputMode(1);//设置接收数据拣出模式，即二进制模式
-		m_ctrlComm.put_InBufferSize(16*1024);//设置串口接收缓冲区大小为16KB
+		m_ctrlComm.put_InBufferSize(8*1024);//设置串口接收缓冲区大小为8KB
 		m_ctrlComm.put_OutBufferSize(128);//设置串口发送缓冲区大小为字节
 
 		switch(m_ctrlComboCommBaudRate.GetCurSel())//根据选择设置波特率
@@ -379,9 +386,11 @@ void CDataAnalysisToolDlg::OnBnClickedButtonOpen()
 		
 		m_ctrlComm.put_PortOpen(TRUE);//打开串口
 		
-		m_ctrlComm.put_RThreshold(1);//设置接收事件触发门槛，表示每当接收到一个及以上字节时引发一个接收事件
+		m_ctrlComm.put_RThreshold(1);//设置接收事件触发门槛，表示每当接收到128个及以上字节时引发一个接收事件
 		m_ctrlComm.put_InputLen(0);//设置读取接收数据长度为，表示无长度限制，每次读取时一次性读取接收缓冲区中的全部数据
 
+
+		
 		m_ctrlComm.put_InBufferCount(0);//清空接收缓冲区，即清除接收缓冲区中的残留数据
 		if(m_ctrlComm.get_PortOpen())
 		{		
@@ -395,12 +404,14 @@ void CDataAnalysisToolDlg::OnBnClickedButtonOpen()
 		}
 		else
 		{
+			
 			OpenPortStatus=FALSE;
 			MessageBox(_T("串口无法打开或已被占用"),_T("串口打开失败"));
 		}
 	}
 	else
 	{
+		ShowSystemStatusPicture(IDB_BITMAP1);
 		OnBnClickedButtonClose();
 	}
 
@@ -469,6 +480,7 @@ void CDataAnalysisToolDlg::OnCommMscomm1()
 	//		strtemp.Format(_T(" %02X"), bt);
 	//		m_strEditDisplayData+=strtemp;//加入接收编辑框对应字符串型映射变量中
 	//	}
+		
 	
 	}
 	
@@ -531,13 +543,31 @@ void CDataAnalysisToolDlg::OnTimer(UINT_PTR nIDEvent)
 	unsigned int i;
 	CString strtemp;
 
+	//VARIANT variant_inp;
+	//COleSafeArray safearray_inp;
+	//LONG len,k;
+	//BYTE temp;
+
 	// TODO: Add your message handler code here and/or call default
 	if(nIDEvent==TIMER_READ_PORT_DATA)
 	{
 		//MessageBox(_T("进入定时器"),_T("定时器"));
-
 		
+		//if(OpenPortStatus==TRUE)
+		//{
+		//	/* 先取出串口缓冲区的数据（低于128字节的数据不会触发串口接收中断，在这里处理） */
+		//	variant_inp=m_ctrlComm.get_Input();//读接收缓冲区
+		//	safearray_inp=variant_inp;//VARIANT型转换成Cstring型变量
+		//	len=safearray_inp.GetOneDimSize();//得到有效数据长度
+		//	for(k=0;k<len;k++)
+		//	{
+		//		safearray_inp.GetElement(&k,&temp);//转换为BYTE型数组
+		//		circular_buf.write(&temp,1);//存入环形缓冲区
 
+		//	}
+		//}
+		
+		//再从环形缓冲区中获取数据
 		datalen=circular_buf.get_buf_length_used();//获取数据长度
 		if(datalen!=0)//环形缓冲区不为空
 		{
@@ -1029,4 +1059,70 @@ void CDataAnalysisToolDlg::OnCbnSelchangeComboBaudrate()
 			MessageBox(str,_T("提示"),MB_ICONINFORMATION);
 		}
 	}
+}
+
+// 显示系统状态图片
+void CDataAnalysisToolDlg::ShowSystemStatusPicture(DWORD bitmap1)
+{
+	
+	//hBmpx = (HBITMAP)LoadImage(AfxGetInstanceHandle(), 
+ //   MAKEINTRESOURCE(bitmap), 
+ //   IMAGE_BITMAP,0,0, 
+ //   LR_LOADMAP3DCOLORS); 
+	//hold = ((CStatic *)GetDlgItem(IDC_STATIC_STATE))->SetBitmap(hBmpx);
+	//m_pictrueControlSystemStatus.MoveWindow(15,150,100,100);
+	//DeleteObject(hold);
+
+
+	//CRect rc;
+	//m_pictrueControlSystemStatus.GetClientRect(&rc);
+	//CDC* pdcpic = m_pictrueControlSystemStatus.GetDC();  //m_ctrlPic是Picture控件的变量  
+ //
+	//CBitmap bitmap1;
+	//bitmap1.LoadBitmap(bitmap);   //IDB_BITMAP_PROTOCOL_3是要加载的位图的ID  
+	//BITMAP bmp1;
+	//bitmap1.GetBitmap(&bmp1);
+	//CDC memdc;
+	//memdc.CreateCompatibleDC(pdcpic);
+	//memdc.SelectObject(&bitmap1);
+ //
+	//CDC ppdc;
+	//ppdc.CreateCompatibleDC(pdcpic);
+	//CBitmap bmpbuf;                    //bmpbuf是要放入控件中的位图  
+	//bmpbuf.CreateCompatibleBitmap(pdcpic, rc.right, rc.bottom);
+	//ppdc.SelectObject(&bmpbuf);
+ //
+	//ppdc.StretchBlt(rc.left, rc.top, rc.Width(), rc.Height(), &memdc, 0, 0, bmp1.bmWidth, bmp1.bmHeight, SRCCOPY);  //将IDB_BITMAP_PROTOCOL_3复制到bmpbuf位图中，并按指定的大小转换  
+ //
+	//m_pictrueControlSystemStatus.SetBitmap((HBITMAP)bmpbuf.Detach());
+	//m_pictrueControlSystemStatus.ReleaseDC(pdcpic);
+	//memdc.DeleteDC();
+	//ppdc.DeleteDC();
+
+	CBitmap bitmap;  
+	UpdateWindow();
+    //加载指定位图资源 Bmp图片ID  
+    bitmap.LoadBitmap(bitmap1);    
+    //获取对话框上的句柄 图片控件ID  
+    CStatic *p=(CStatic *)GetDlgItem(IDC_STATIC_STATE);    
+    //设置静态控件窗口风格为位图居中显示   
+    p->ModifyStyle(0xf,SS_BITMAP|SS_CENTERIMAGE);   
+    //将图片设置到Picture控件上  
+    p->SetBitmap(bitmap);   
+ 
+    BITMAP bmpInfo; 
+    bitmap.GetBitmap(&bmpInfo); 
+    CDC dcMemory; 
+    CDC* pDC=GetDlgItem(IDC_STATIC_STATE)->GetDC(); 
+    dcMemory.CreateCompatibleDC(pDC); 
+    CBitmap* pOldBitmap = dcMemory.SelectObject(&bitmap); 
+    CRect rect; 
+    m_pictrueControlSystemStatus.GetClientRect(&rect);
+    int nX = rect.left + (rect.Width() - bmpInfo.bmWidth) / 2; 
+    int nY = rect.top + (rect.Height() - bmpInfo.bmHeight) / 2; 
+    //pDC->BitBlt(0, 0, bmpInfo.bmWidth, bmpInfo.bmHeight, &dcMemory, 0, 0, SRCCOPY);  
+    pDC->SetStretchBltMode(COLORONCOLOR); 
+    pDC->StretchBlt(0, 0,rect.Width(),rect.Height(),&dcMemory,0, 0, bmpInfo.bmWidth, bmpInfo.bmHeight,SRCCOPY); 
+    dcMemory.SelectObject(pOldBitmap); 
+    ReleaseDC(pDC); 
 }

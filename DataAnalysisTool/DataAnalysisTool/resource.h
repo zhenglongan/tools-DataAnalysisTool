@@ -10,6 +10,10 @@
 #define IDP_SOCKETS_INIT_FAILED         103
 #define IDR_MAINFRAME                   128
 #define IDR_MENU1                       129
+#define IDI_ICON1                       131
+#define IDI_ICON2                       135
+#define IDB_BITMAP1                     136
+#define IDB_BITMAP2                     139
 #define IDC_MSCOMM1                     1000
 #define IDC_COMBO_PORT                  1001
 #define IDC_BUTTON_OPEN                 1002
@@ -23,6 +27,7 @@
 #define IDC_EDIT4                       1009
 #define IDC_EDIT2                       1010
 #define IDC_STATIC_UNCONGNIZED          1011
+#define IDC_STATIC_STATE                1012
 #define ID_32771                        32771
 #define ID_32772                        32772
 #define ID_Menu                         32773
@@ -32,9 +37,9 @@
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        131
+#define _APS_NEXT_RESOURCE_VALUE        140
 #define _APS_NEXT_COMMAND_VALUE         32775
-#define _APS_NEXT_CONTROL_VALUE         1012
+#define _APS_NEXT_CONTROL_VALUE         1013
 #define _APS_NEXT_SYMED_VALUE           101
 #endif
 #endif

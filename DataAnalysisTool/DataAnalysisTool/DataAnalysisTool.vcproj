@@ -299,6 +299,22 @@
 			UniqueIdentifier="{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}"
 			>
 			<File
+				RelativePath=".\res\02_ready.bmp"
+				>
+			</File>
+			<File
+				RelativePath=".\res\02_ready.ico"
+				>
+			</File>
+			<File
+				RelativePath=".\res\ϵͳ״̬ͼ��\04_run.bmp"
+				>
+			</File>
+			<File
+				RelativePath=".\res\bitmap2.bmp"
+				>
+			</File>
+			<File
 				RelativePath=".\res\DataAnalysisTool.ico"
 				>
 			</File>
@@ -308,6 +324,10 @@
 			</File>
 			<File
 				RelativePath=".\res\DataAnalysisTool.rc2"
+				>
+			</File>
+			<File
+				RelativePath=".\res\icon2.ico"
 				>
 			</File>
 		</Filter>

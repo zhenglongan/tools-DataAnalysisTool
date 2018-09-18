@@ -88,4 +88,8 @@ public:
 	CString strCurrentPortName;
 	afx_msg void OnCbnSelchangeComboPort();
 	afx_msg void OnCbnSelchangeComboBaudrate();
+	// 用于显示系统状态图标
+	CStatic m_pictrueControlSystemStatus;
+	// 显示系统状态图片
+	void ShowSystemStatusPicture(DWORD bitmap);
 };
