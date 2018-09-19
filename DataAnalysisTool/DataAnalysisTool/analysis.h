@@ -241,6 +241,7 @@
 
 extern BYTE rcv_buf[MAX_PACKET_LENGTH];//缓存解析完成的通信数据
 
+
 typedef enum	//通信包接收状态
 {
     RCV_STATE_IDLE,			/*!< Receiver is in idle state. */
@@ -256,6 +257,70 @@ typedef enum	//通信包接收状态
     RCV_STATE_CMPL,         /*!< Frame received completely. */
     CLOUD_STATE_RX_ERROR
 }RcvState;
+
+
+typedef enum	//中捷竖屏系统状态定义
+{
+    SYSTEM_STATE_ZOJE_VERTICAL_RESERVE		=(0),			/*!<  */
+	SYSTEM_STATE_ZOJE_VERTICAL_FREE			=(1),			/*!<  */
+	SYSTEM_STATE_ZOJE_VERTICAL_READY		=(2),			/*!<  */
+	SYSTEM_STATE_ZOJE_VERTICAL_RUN			=(3),			/*!<  */
+	SYSTEM_STATE_ZOJE_VERTICAL_ERROR		=(4),			/*!<  */
+	SYSTEM_STATE_ZOJE_VERTICAL_PREWIND		=(5),			/*!<  */
+	SYSTEM_STATE_ZOJE_VERTICAL_WIND			=(6),			/*!<  */
+	SYSTEM_STATE_ZOJE_VERTICAL_INPRESS		=(7),			/*!<  */
+	SYSTEM_STATE_ZOJE_VERTICAL_POWEROFF		=(8),			/*!<  */
+	SYSTEM_STATE_ZOJE_VERTICAL_SINGLE		=(9),			/*!<  */
+
+	SYSTEM_STATE_ZOJE_VERTICAL_MANUAL		=(10),			/*!<  */
+	SYSTEM_STATE_ZOJE_VERTICAL_SETOUT		=(11),			/*!<  */
+	SYSTEM_STATE_ZOJE_VERTICAL_EMERSTOP		=(12),			/*!<  */
+	SYSTEM_STATE_ZOJE_VERTICAL_PREEDIT		=(13),			/*!<  */
+	SYSTEM_STATE_ZOJE_VERTICAL_EDIT			=(14),			/*!<  */
+	SYSTEM_STATE_ZOJE_VERTICAL_NOEDIT		=(15),			/*!<  */
+	SYSTEM_STATE_ZOJE_VERTICAL_FINISH		=(16),			/*!<  */
+	SYSTEM_STATE_ZOJE_VERTICAL_NEEDLE		=(17),			/*!<  */
+	SYSTEM_STATE_ZOJE_VERTICAL_WAITOFF		=(18),			/*!<  */
+	SYSTEM_STATE_ZOJE_VERTICAL_TRIM			=(19),			/*!<  */
+
+	SYSTEM_STATE_ZOJE_VERTICAL_SLACK		=(20),			/*!<  */
+	SYSTEM_STATE_ZOJE_VERTICAL_CHECKI03		=(21),			/*!<  */
+	SYSTEM_STATE_ZOJE_VERTICAL_CHECKI04		=(22),			/*!<  */
+	SYSTEM_STATE_ZOJE_VERTICAL_CHECKI05		=(23),			/*!<  */
+	SYSTEM_STATE_ZOJE_VERTICAL_CHECKI06		=(24),			/*!<  */
+	SYSTEM_STATE_ZOJE_VERTICAL_CHECKI07		=(25),			/*!<  */
+	SYSTEM_STATE_ZOJE_VERTICAL_CHECKI08		=(26),			/*!<  */
+	SYSTEM_STATE_ZOJE_VERTICAL_CHECKI10		=(27),			/*!<  */
+	SYSTEM_STATE_ZOJE_VERTICAL_EMERMOVE		=(28),			/*!<  */
+	SYSTEM_STATE_ZOJE_VERTICAL_BOARDTEST	=(29),			/*!<  */
+
+	SYSTEM_STATE_ZOJE_VERTICAL_RFID_WR				=(30),			/*!<  */
+	SYSTEM_STATE_ZOJE_VERTICAL_CALSEW				=(31),			/*!<  */
+	SYSTEM_STATE_ZOJE_VERTICAL_CHECKI11				=(32),			/*!<  */
+
+	SYSTEM_STATE_ZOJE_VERTICAL_DOWNLOAD_DSP1		=(35),			/*!<  */
+	SYSTEM_STATE_ZOJE_VERTICAL_DOWNLOAD_DSP2		=(36),			/*!<  */
+	SYSTEM_STATE_ZOJE_VERTICAL_DOWNLOAD_DSP_CURVE	=(37),			/*!<  */
+	SYSTEM_STATE_ZOJE_VERTICAL_MULTIPULE_IO			=(38),			/*!<  */
+	SYSTEM_STATE_ZOJE_VERTICAL_DOWNLOAD_DSP3		=(39),			/*!<  */
+	SYSTEM_STATE_ZOJE_VERTICAL_DOWNLOAD_DSP4		=(40),			/*!<  */
+	SYSTEM_STATE_ZOJE_VERTICAL_DOWNLOAD_SPFL		=(41),			/*!<  */
+	
+	SYSTEM_STATE_ZOJE_VERTICAL_DOWNLOAD				=(72),			/*!<  */
+}SystemState_ZOJE_VERTICAL;
+
+typedef struct  
+{
+  UINT8 status;      // system status
+//  UINT8 u24_val;     // vol of U24
+  UINT16 error;      // system error
+//  INT16 uzk_val;     // vol of UZK
+  INT32 allx_step;
+  INT32 ally_step;
+} SYS_STRU;
+
+extern SYS_STRU sys;//缝纫机的系统状态机状态值
+
 
 
 void analysis_rcv_FSM(BYTE dat);//解析通信帧
@@ -277,5 +342,10 @@ unsigned int analysis_get_correct_slave_pocket_number(void);//获取正确解析的从机
 void analysis_clear_correct_slave_pocket_number(void);//清零正确解析的从机包个数
 
 
+//不同功能码处理函数
+//主控返回的查询指令0x82
+void analysis_slave_query(BYTE* pcommdata);
+//主控返回的查询指令0x89
+void analysis_slave_coor(BYTE* pcommdata);
 
 #endif

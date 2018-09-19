@@ -109,6 +109,8 @@ void CDataAnalysisToolDlg::DoDataExchange(CDataExchange* pDX)
 	DDX_Text(pDX, IDC_EDIT3, m_strEditSlavePacketNumber);
 	DDX_Text(pDX, IDC_EDIT4, m_strEditMasterPacketNumber);
 	DDX_Control(pDX, IDC_STATIC_STATE, m_pictrueControlSystemStatus);
+	DDX_Control(pDX, IDC_EDIT_X_COOR, X_coor);
+	DDX_Control(pDX, IDC_EDIT_Y_COOR, Y_coor);
 }
 
 BEGIN_MESSAGE_MAP(CDataAnalysisToolDlg, CDialog)
@@ -169,7 +171,7 @@ BOOL CDataAnalysisToolDlg::OnInitDialog()
 	hAccel=::LoadAccelerators(AfxGetInstanceHandle(),MAKEINTRESOURCE(IDR_ACCELERATOR1));//添加快捷键到监控按钮
 
 
-	ShowSystemStatusPicture(IDB_BITMAP1);//IDB_BITMAP1
+	ShowSystemStatusPicture(IDB_BITMAP_SYS01);//上电系统状态显示,好像并没有什么用
 
 	OpenPortStatus=FALSE;
 	//串口初始化
@@ -216,6 +218,7 @@ BOOL CDataAnalysisToolDlg::OnInitDialog()
 	//analysis_init(&m_strEditDisplayData);//初始化协议解析模块
 	display_new_line.Empty();
 	analysis_init(&display_new_line);//初始化协议解析模块
+	refresh_coor(0,0);
 	//↑↑↑↑↑↑↑↑↑↑↑↑↑以下是我们自己添加的程序↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑
 	
 
@@ -334,7 +337,8 @@ void CDataAnalysisToolDlg::OnBnClickedButtonOpen()
 
 	if(OpenPortStatus==FALSE)//如果串口未打开，执行下列内容
 	{
-		ShowSystemStatusPicture(IDB_BITMAP2);
+		//ShowSystemStatusPicture(IDB_BITMAP_SYS01);//上电系统状态显示
+
 		m_nPort=asi[m_ctrlComboCommPort.GetCurSel()].cComNum;//获得组合框中的串口号
 
 		m_ctrlComm.put_CommPort(m_nPort);//选择相应串口
@@ -416,7 +420,6 @@ void CDataAnalysisToolDlg::OnBnClickedButtonOpen()
 	}
 	else
 	{
-		ShowSystemStatusPicture(IDB_BITMAP1);
 		OnBnClickedButtonClose();
 	}
 
@@ -540,6 +543,8 @@ void CDataAnalysisToolDlg::OnBnClickedButtonClearData()
 	//监控窗口
 	m_strEditDisplayData.Empty();
 	UpdateData(FALSE);//更新编辑框内容，即在接收显示框中显示接收数据
+
+
 }
 
 void CDataAnalysisToolDlg::OnTimer(UINT_PTR nIDEvent)
@@ -619,7 +624,12 @@ void CDataAnalysisToolDlg::OnTimer(UINT_PTR nIDEvent)
 			//因为函数UpdateData(FALSE);会把滚动条自动上拉，所以导致滚动条上下来回滚动，因此干脆不用了
 			//m_ctrlEditDataDisplay.LineScroll(m_ctrlEditDataDisplay.GetLineCount());//滚动显示到最后一行
 			//this->SendDlgItemMessage(IDC_EDIT_DATA_DISPLAY,WM_VSCROLL, SB_BOTTOM,0); //滚动条始终在底部
+			
 
+			//处理系统状态图标的更新
+			ProcessSystemStateIcon(&sys);
+			//更新系统当前坐标
+			refresh_coor(sys.allx_step,sys.ally_step);
 		}
 		else//环形缓冲区空
 		{
@@ -1125,10 +1135,17 @@ void CDataAnalysisToolDlg::ShowSystemStatusPicture(DWORD bitmap1)
     m_pictrueControlSystemStatus.GetClientRect(&rect);
     int nX = rect.left + (rect.Width() - bmpInfo.bmWidth) / 2; 
     int nY = rect.top + (rect.Height() - bmpInfo.bmHeight) / 2; 
-    //pDC->BitBlt(0, 0, bmpInfo.bmWidth, bmpInfo.bmHeight, &dcMemory, 0, 0, SRCCOPY);  
-    pDC->SetStretchBltMode(COLORONCOLOR); 
-    pDC->StretchBlt(0, 0,rect.Width(),rect.Height(),&dcMemory,0, 0, bmpInfo.bmWidth, bmpInfo.bmHeight,SRCCOPY); 
-    dcMemory.SelectObject(pOldBitmap); 
+   // pDC->BitBlt(0, 0, bmpInfo.bmWidth, bmpInfo.bmHeight, &dcMemory, 0, 0, SRCCOPY);
+	
+	//不会压缩源文件
+	//pDC->BitBlt(0, 0, rect.Width(),rect.Height(), &dcMemory, 0, 0, SRCCOPY);
+   
+	pDC->SetStretchBltMode(STRETCH_HALFTONE); 
+	
+	//压缩源文件显示  
+	pDC->StretchBlt(0, 0,rect.Width(),rect.Height(),&dcMemory,0, 0, bmpInfo.bmWidth, bmpInfo.bmHeight,SRCCOPY); 
+    
+	dcMemory.SelectObject(pOldBitmap); 
     ReleaseDC(pDC); 
 }
 
@@ -1140,4 +1157,210 @@ BOOL CDataAnalysisToolDlg::PreTranslateMessage(MSG* pMsg)
 	
 
 	return CDialog::PreTranslateMessage(pMsg);
+}
+
+void CDataAnalysisToolDlg::ProcessSystemStateIcon(SYS_STRU* p_sys)
+{
+	static UINT8 state=1;
+	DWORD bmp;
+
+	//状态未改变，直接返回，不必更新
+	if(p_sys->status == state)
+		return;
+
+
+	state = p_sys->status;
+	switch(p_sys->status)
+	{
+		case SYSTEM_STATE_ZOJE_VERTICAL_RESERVE:
+			bmp=IDB_BITMAP_SYS00;
+			break;
+
+		case SYSTEM_STATE_ZOJE_VERTICAL_FREE:
+			bmp=IDB_BITMAP_SYS01;
+			break;
+
+		case SYSTEM_STATE_ZOJE_VERTICAL_READY:
+			bmp=IDB_BITMAP_SYS02;
+			break;
+
+		case SYSTEM_STATE_ZOJE_VERTICAL_RUN:
+			bmp=IDB_BITMAP_SYS03;
+			break;
+
+		case SYSTEM_STATE_ZOJE_VERTICAL_ERROR:
+			bmp=IDB_BITMAP_SYS04;
+			break;
+
+		case SYSTEM_STATE_ZOJE_VERTICAL_PREWIND:
+			bmp=IDB_BITMAP_SYS05;
+			break;
+
+		case SYSTEM_STATE_ZOJE_VERTICAL_WIND:
+			bmp=IDB_BITMAP_SYS06;
+			break;
+
+		case SYSTEM_STATE_ZOJE_VERTICAL_INPRESS:
+			bmp=IDB_BITMAP_SYS07;
+			break;
+
+		case SYSTEM_STATE_ZOJE_VERTICAL_POWEROFF:
+			bmp=IDB_BITMAP_SYS08;
+			break;
+
+		case SYSTEM_STATE_ZOJE_VERTICAL_SINGLE:
+			bmp=IDB_BITMAP_SYS09;
+			break;
+
+		case SYSTEM_STATE_ZOJE_VERTICAL_MANUAL:
+			bmp=IDB_BITMAP_SYS10;
+			break;
+		case SYSTEM_STATE_ZOJE_VERTICAL_SETOUT:
+			bmp=IDB_BITMAP_SYS11;
+			break;
+
+		case SYSTEM_STATE_ZOJE_VERTICAL_EMERSTOP:
+			bmp=IDB_BITMAP_SYS12;
+			break;
+
+		case SYSTEM_STATE_ZOJE_VERTICAL_PREEDIT:
+			bmp=IDB_BITMAP_SYS13;
+			break;
+
+		case SYSTEM_STATE_ZOJE_VERTICAL_EDIT:
+			bmp=IDB_BITMAP_SYS14;
+			break;
+
+		case SYSTEM_STATE_ZOJE_VERTICAL_NOEDIT:
+			bmp=IDB_BITMAP_SYS15;
+			break;
+
+		case SYSTEM_STATE_ZOJE_VERTICAL_FINISH:
+			bmp=IDB_BITMAP_SYS16;
+			break;
+
+		case SYSTEM_STATE_ZOJE_VERTICAL_NEEDLE:
+			bmp=IDB_BITMAP_SYS17;
+			break;
+
+		case SYSTEM_STATE_ZOJE_VERTICAL_WAITOFF:
+			bmp=IDB_BITMAP_SYS18;
+			break;
+
+		case SYSTEM_STATE_ZOJE_VERTICAL_TRIM:
+			bmp=IDB_BITMAP_SYS19;
+			break;
+
+		case SYSTEM_STATE_ZOJE_VERTICAL_SLACK:
+			bmp=IDB_BITMAP_SYS20;
+			break;
+
+		case SYSTEM_STATE_ZOJE_VERTICAL_CHECKI03:
+			bmp=IDB_BITMAP_SYS21;
+			break;
+
+		case SYSTEM_STATE_ZOJE_VERTICAL_CHECKI04:
+			bmp=IDB_BITMAP_SYS22;
+			break;
+
+		case SYSTEM_STATE_ZOJE_VERTICAL_CHECKI05:
+			bmp=IDB_BITMAP_SYS23;
+			break;
+
+		case SYSTEM_STATE_ZOJE_VERTICAL_CHECKI06:
+			bmp=IDB_BITMAP_SYS24;
+			break;
+
+		case SYSTEM_STATE_ZOJE_VERTICAL_CHECKI07:
+			bmp=IDB_BITMAP_SYS25;
+			break;
+
+		case SYSTEM_STATE_ZOJE_VERTICAL_CHECKI08:
+			bmp=IDB_BITMAP_SYS26;
+			break;
+
+		case SYSTEM_STATE_ZOJE_VERTICAL_CHECKI10:
+			bmp=IDB_BITMAP_SYS27;
+			break;
+
+		case SYSTEM_STATE_ZOJE_VERTICAL_EMERMOVE:
+			bmp=IDB_BITMAP_SYS28;
+			break;
+
+		case SYSTEM_STATE_ZOJE_VERTICAL_BOARDTEST:
+			bmp=IDB_BITMAP_SYS29;
+			break;
+
+		case SYSTEM_STATE_ZOJE_VERTICAL_RFID_WR:
+			bmp=IDB_BITMAP_SYS30;
+			break;
+
+		case SYSTEM_STATE_ZOJE_VERTICAL_CALSEW:
+			bmp=IDB_BITMAP_SYS31;
+			break;
+
+		case SYSTEM_STATE_ZOJE_VERTICAL_CHECKI11:
+			bmp=IDB_BITMAP_SYS32;
+			break;
+
+		case SYSTEM_STATE_ZOJE_VERTICAL_DOWNLOAD_DSP1:
+			bmp=IDB_BITMAP_SYS35;
+			break;
+
+		case SYSTEM_STATE_ZOJE_VERTICAL_DOWNLOAD_DSP2:
+			bmp=IDB_BITMAP_SYS36;
+			break;
+
+		case SYSTEM_STATE_ZOJE_VERTICAL_DOWNLOAD_DSP_CURVE:
+			bmp=IDB_BITMAP_SYS37;
+			break;
+
+		case SYSTEM_STATE_ZOJE_VERTICAL_MULTIPULE_IO:
+			bmp=IDB_BITMAP_SYS38;
+			break;
+
+		case SYSTEM_STATE_ZOJE_VERTICAL_DOWNLOAD_DSP3:
+			bmp=IDB_BITMAP_SYS39;
+			break;
+
+		case SYSTEM_STATE_ZOJE_VERTICAL_DOWNLOAD_DSP4:
+			bmp=IDB_BITMAP_SYS40;
+			break;
+
+		case SYSTEM_STATE_ZOJE_VERTICAL_DOWNLOAD_SPFL:
+			bmp=IDB_BITMAP_SYS41;
+			break;
+
+		case SYSTEM_STATE_ZOJE_VERTICAL_DOWNLOAD:
+			bmp=IDB_BITMAP_SYS72;
+			break;
+
+		//未识别状态
+		default:
+			bmp=IDB_BITMAP_SYSXX;
+			break;
+	}
+	//更新图片
+	ShowSystemStatusPicture(bmp);
+}
+
+// 更新系统当前坐标值的显示
+void CDataAnalysisToolDlg::refresh_coor(INT32 x,INT32 y)
+{
+	static INT32 x0=-1,y0=-1;
+	CString str;
+
+	if(x0==x && y0==y)
+	{
+		//没变
+	}
+	else
+	{
+		x0=x;
+		y0=y;
+		str.Format(_T("X:%d"),x);
+		X_coor.SetWindowTextW(str);
+		str.Format(_T("Y:%d"),y);
+		Y_coor.SetWindowTextW(str);
+	}
 }

@@ -111,7 +111,9 @@ BEGIN
     EDITTEXT        IDC_EDIT3,292,258,62,7,ES_CENTER | ES_AUTOHSCROLL | ES_READONLY | NOT WS_BORDER
     EDITTEXT        IDC_EDIT4,224,258,62,7,ES_CENTER | ES_AUTOHSCROLL | ES_READONLY | NOT WS_BORDER
     PUSHBUTTON      "停止监听",IDC_BUTTON_CLOSE,32,250,14,11,NOT WS_VISIBLE
-    CONTROL         139,IDC_STATIC_STATE,"Static",SS_BITMAP | SS_CENTERIMAGE | SS_REALSIZEIMAGE,7,64,48,42
+    CONTROL         "",IDC_STATIC_STATE,"Static",SS_BITMAP | SS_CENTERIMAGE | SS_REALSIZEIMAGE,1,64,58,50
+    EDITTEXT        IDC_EDIT_X_COOR,7,118,48,11,ES_AUTOHSCROLL | ES_READONLY | NOT WS_BORDER
+    EDITTEXT        IDC_EDIT_Y_COOR,7,129,48,14,ES_AUTOHSCROLL | ES_READONLY | NOT WS_BORDER
 END
 
 
@@ -279,8 +281,48 @@ END
 // Bitmap
 //
 
-IDB_BITMAP1             BITMAP                  "res\\02_ready.bmp"
-IDB_BITMAP2             BITMAP                  "res\\系统状态图标\\04_run.bmp"
+IDB_BITMAP_SYS00        BITMAP                  "res\\系统状态图标\\中捷状态bmp\\0_RESERVE.bmp"
+IDB_BITMAP_SYS01        BITMAP                  "res\\系统状态图标\\中捷状态bmp\\1_FREE.bmp"
+IDB_BITMAP_SYS02        BITMAP                  "res\\系统状态图标\\中捷状态bmp\\2_READY.bmp"
+IDB_BITMAP_SYS03        BITMAP                  "res\\系统状态图标\\中捷状态bmp\\3_RUN.bmp"
+IDB_BITMAP_SYS04        BITMAP                  "res\\系统状态图标\\中捷状态bmp\\4_ERROR.bmp"
+IDB_BITMAP_SYS05        BITMAP                  "res\\系统状态图标\\中捷状态bmp\\5_PERWIND.bmp"
+IDB_BITMAP_SYS06        BITMAP                  "res\\系统状态图标\\中捷状态bmp\\6_WIND.bmp"
+IDB_BITMAP_SYS07        BITMAP                  "res\\系统状态图标\\中捷状态bmp\\7_INPRESS.bmp"
+IDB_BITMAP_SYS08        BITMAP                  "res\\系统状态图标\\中捷状态bmp\\8_POWEROFF.bmp"
+IDB_BITMAP_SYS09        BITMAP                  "res\\系统状态图标\\中捷状态bmp\\9_SINGLE.bmp"
+IDB_BITMAP_SYS10        BITMAP                  "res\\系统状态图标\\中捷状态bmp\\10_MANUAL.bmp"
+IDB_BITMAP_SYS11        BITMAP                  "res\\系统状态图标\\中捷状态bmp\\11_SETOUT.bmp"
+IDB_BITMAP_SYS12        BITMAP                  "res\\系统状态图标\\中捷状态bmp\\12_EMERSTOP.bmp"
+IDB_BITMAP_SYS13        BITMAP                  "res\\系统状态图标\\中捷状态bmp\\13_PREEDIT.bmp"
+IDB_BITMAP_SYS14        BITMAP                  "res\\系统状态图标\\中捷状态bmp\\14_EDIT.bmp"
+IDB_BITMAP_SYS15        BITMAP                  "res\\系统状态图标\\中捷状态bmp\\15_NOEDIT.bmp"
+IDB_BITMAP_SYS16        BITMAP                  "res\\系统状态图标\\中捷状态bmp\\16_FINISH.bmp"
+IDB_BITMAP_SYS17        BITMAP                  "res\\系统状态图标\\中捷状态bmp\\17_NEEDLE.bmp"
+IDB_BITMAP_SYS18        BITMAP                  "res\\系统状态图标\\中捷状态bmp\\18_WAITOFF.bmp"
+IDB_BITMAP_SYS19        BITMAP                  "res\\系统状态图标\\中捷状态bmp\\19_TRIM.bmp"
+IDB_BITMAP_SYS20        BITMAP                  "res\\系统状态图标\\中捷状态bmp\\20_SLACK.bmp"
+IDB_BITMAP_SYS21        BITMAP                  "res\\系统状态图标\\中捷状态bmp\\21_CHECKI03.bmp"
+IDB_BITMAP_SYS22        BITMAP                  "res\\系统状态图标\\中捷状态bmp\\22_CHECKI04.bmp"
+IDB_BITMAP_SYS23        BITMAP                  "res\\系统状态图标\\中捷状态bmp\\23_CHECKI05.bmp"
+IDB_BITMAP_SYS24        BITMAP                  "res\\系统状态图标\\中捷状态bmp\\24_CHECKI06.bmp"
+IDB_BITMAP_SYS25        BITMAP                  "res\\系统状态图标\\中捷状态bmp\\25_CHECKI07.bmp"
+IDB_BITMAP_SYS26        BITMAP                  "res\\系统状态图标\\中捷状态bmp\\26_CHECKI08.bmp"
+IDB_BITMAP_SYS27        BITMAP                  "res\\系统状态图标\\中捷状态bmp\\27_CHECKI10.bmp"
+IDB_BITMAP_SYS28        BITMAP                  "res\\系统状态图标\\中捷状态bmp\\28_EMERMOVE.bmp"
+IDB_BITMAP_SYS29        BITMAP                  "res\\系统状态图标\\中捷状态bmp\\29_BOARDTEST.bmp"
+IDB_BITMAP_SYS30        BITMAP                  "res\\系统状态图标\\中捷状态bmp\\30_RFIDWR.bmp"
+IDB_BITMAP_SYS31        BITMAP                  "res\\系统状态图标\\中捷状态bmp\\31_CALSEW.bmp"
+IDB_BITMAP_SYS32        BITMAP                  "res\\系统状态图标\\中捷状态bmp\\32_CHECKI11.bmp"
+IDB_BITMAP_SYS35        BITMAP                  "res\\系统状态图标\\中捷状态bmp\\35_DOWNLOADDSP1.bmp"
+IDB_BITMAP_SYS36        BITMAP                  "res\\系统状态图标\\中捷状态bmp\\36_DOWNLOADDSP2.bmp"
+IDB_BITMAP_SYS37        BITMAP                  "res\\系统状态图标\\中捷状态bmp\\37_DOWNLOADDSPCURVE.bmp"
+IDB_BITMAP_SYS38        BITMAP                  "res\\系统状态图标\\中捷状态bmp\\38_MULTIPULE.bmp"
+IDB_BITMAP_SYS39        BITMAP                  "res\\系统状态图标\\中捷状态bmp\\39_DOWNLOADDSP3.bmp"
+IDB_BITMAP_SYS40        BITMAP                  "res\\系统状态图标\\中捷状态bmp\\40_DOWNLOADDSP4.bmp"
+IDB_BITMAP_SYS41        BITMAP                  "res\\系统状态图标\\中捷状态bmp\\41_DOWNLOADSPFL.bmp"
+IDB_BITMAP_SYS72        BITMAP                  "res\\系统状态图标\\中捷状态bmp\\72_DOWLOAD.bmp"
+IDB_BITMAP_SYSXX        BITMAP                  "res\\系统状态图标\\中捷状态bmp\\X_UNRECOGNIZED.bmp"
 
 /////////////////////////////////////////////////////////////////////////////
 //

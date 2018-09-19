@@ -1,7 +1,10 @@
 #include "StdAfx.h"
 #include "analysis.h"
+#include "tools.h"
+
 
 BYTE rcv_buf[MAX_PACKET_LENGTH];
+SYS_STRU sys;//缝纫机的系统状态机状态值
 
 static volatile RcvState RxState;//通信接收状态
 static volatile unsigned int discard_number;//无法解析的字符数
@@ -24,7 +27,13 @@ void analysis_init(CString *pstr)//初始化相关变量
 
 	pstrOut = pstr;//制定输出字符串变量
 	memset(rcv_buf,0x00,MAX_PACKET_LENGTH);
-}
+
+	//上电时缝纫机系统状态机默认状态为01:FREE
+	sys.status = SYSTEM_STATE_ZOJE_VERTICAL_FREE;
+	sys.error = 0;
+	sys.allx_step = 0;
+	sys.ally_step = 0;
+}	
 
 
 void analysis_rcv_FSM(BYTE dat)//解析数据帧：接收状态机函数
@@ -203,6 +212,50 @@ void analysis_clear_correct_slave_pocket_number(void)//清零正确解析的从机包个数
 	correct_slave_pocket_number=0;
 }
 
+//不同功能码处理函数
+//主控返回的查询指令0x82
+void analysis_slave_query(BYTE* pcommdata)
+{
+	BYTE command_word;
+
+	command_word=pcommdata[2];
+	if(command_word!=QUERY_RET)
+		return;
+
+	sys.status = pcommdata[3];//状态值
+	sys.error = pcommdata[4];//错误代码
+	//横屏
+	sys.allx_step = (INT32)bytes_to_int16(pcommdata[13],pcommdata[14]);
+	sys.ally_step = (INT32)bytes_to_int16(pcommdata[15],pcommdata[16]);
+
+
+	//竖屏,绝对坐标值不在这条指令里
+}
+//主控返回的查询指令0x89
+void analysis_slave_coor(BYTE* pcommdata)
+{
+	BYTE command_word,len;
+
+	command_word=pcommdata[2];
+	len=pcommdata[1];
+
+	if(command_word!=COOR_RET)
+		return;
+	if(len>7)//竖屏使用了4字节表示坐标
+	{
+		//绝对坐标值
+		sys.allx_step = bytes_to_int32(pcommdata[7],pcommdata[8],pcommdata[3],pcommdata[4]);
+		sys.ally_step = bytes_to_int32(pcommdata[9],pcommdata[10],pcommdata[5],pcommdata[6]);
+	}
+	else//横屏使用了2字节表示坐标
+	{
+		//绝对坐标值
+		sys.allx_step = (INT32)bytes_to_int16(pcommdata[3],pcommdata[4]);
+		sys.ally_step = (INT32)bytes_to_int16(pcommdata[5],pcommdata[6]);
+	}
+
+}
+
 
 void analysis_protocol(BYTE* pcommdata,CString *pstrout)//解析正确的通信帧并输出相应的解析信息
 {
@@ -297,6 +350,19 @@ void analysis_protocol(BYTE* pcommdata,CString *pstrout)//解析正确的通信帧并输出
 		}
 		//此处添加解析数据,暂时忽略
 		//......
+		switch(command_word)
+		{
+			case QUERY_RET://0x82+0x60
+				analysis_slave_query(pcommdata);//处理查询指令的反馈，可以获取系统状态值
+				break;
+
+			case COOR_RET://0x89+0x60
+				analysis_slave_coor(pcommdata);//处理查询指令的反馈，可以获取系统坐标值
+				break;
+				
+			default:
+				break;
+		}
 		correct_slave_pocket_number++;//从机正确解析数+1
 
 
@@ -306,5 +372,6 @@ void analysis_protocol(BYTE* pcommdata,CString *pstrout)//解析正确的通信帧并输出
 		*pstrout+=_T("\r\n");
 		*pstrout+=_T("\r\n");//从机多加一个换行，这样可以分辨出主从机指令的配对情况
 	}
+
 
 }

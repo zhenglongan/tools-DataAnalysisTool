@@ -6,6 +6,7 @@
 #include "afxwin.h"
 #include "mscomm1.h"
 #include "CircularBuf.h"
+#include "analysis.h"
 
 class CDataAnalysisToolDlgAutoProxy;
 
@@ -95,4 +96,12 @@ public:
 
 	HACCEL hAccel;//快捷键
 	virtual BOOL PreTranslateMessage(MSG* pMsg);
+	// 根据系统状态的值去更新图标的显示
+	void ProcessSystemStateIcon(SYS_STRU* p_sys);
+	// X绝对坐标
+	CEdit X_coor;
+	// Y绝对坐标
+	CEdit Y_coor;
+	// 更新系统当前坐标值的显示
+	void refresh_coor(INT32 x,INT32 y);
 };
