@@ -1,10 +1,11 @@
 #include "StdAfx.h"
 #include "analysis.h"
 #include "tools.h"
-
+#include "CommandMask.h"
 
 BYTE rcv_buf[MAX_PACKET_LENGTH];
 SYS_STRU sys;//缝纫机的系统状态机状态值
+CString SYS_ERROR_INFO[200];//错误提示信息
 
 static volatile RcvState RxState;//通信接收状态
 static volatile unsigned int discard_number;//无法解析的字符数
@@ -264,6 +265,7 @@ void analysis_protocol(BYTE* pcommdata,CString *pstrout)//解析正确的通信帧并输出
 	unsigned int i;
 	CString strtemp,strtime;
 	unsigned int len;
+	INT8 ret;
 
 	get_current_time(&strtime);//获取系统时间到字符串strtime，格式为hh:mm:ss:mmm
 
@@ -321,39 +323,77 @@ void analysis_protocol(BYTE* pcommdata,CString *pstrout)//解析正确的通信帧并输出
 	{
 		*pstrout+=strtime;
 		*pstrout+=_T(" Master-->");//首先显示时间和头部信息
-
-		//发送花样的时候，程序卡死在这里，因为i定义成乐BYTE，但是len+2已经大于255了
-		//所以这里成了死循环，最后修改i为unsigned int型就解决问题了-2018-9-18
-		for(i=0;i<len+2;i++)//原文粘贴数据
+		
+		ret = MaskCheckItem(command_word);
+		//如果指令在屏蔽列表，那么不显示此指令（分析照常进行，仅是不显示了）
+		if( ret<0 )//没有找到屏蔽项
 		{
-			strtemp.Format(_T(" %02X"), rcv_buf[i]);
-			*pstrout+=strtemp;//加入接收编辑框对应字符串型映射变量中
+			//发送花样的时候，程序卡死在这里，因为i定义成乐BYTE，但是len+2已经大于255了
+			//所以这里成了死循环，最后修改i为unsigned int型就解决问题了-2018-9-18
+			for(i=0;i<len+2;i++)//原文粘贴数据
+			{
+				strtemp.Format(_T(" %02X"), rcv_buf[i]);
+				*pstrout+=strtemp;//加入接收编辑框对应字符串型映射变量中
+			}
+			//最后添加换行，完成分析并输出
+			*pstrout+=_T("\r\n");
+
 		}
+		else
+		{
+			pstrout->Empty();
+		}
+
 		//此处添加解析数据,暂时忽略
 		//......
+		switch(command_word)
+		{
+			case CHANGE://0x81
+				//AfxMessageBox(_T("面板发出改变状态指令，功能码0x81"));
+				break;
+
+			case COOR://0x8
+				break;
+				
+			default:
+				break;
+		}
+
 
 		correct_master_pocket_number++;//主机正确解析数+1
 
-		//最后添加换行，完成分析并输出
-		*pstrout+=_T("\r\n");
+		
 	}
 	//------------------------------------------------从机指令-----------------------------------------------
 	else
 	{
 		*pstrout+=strtime;
 		*pstrout+=_T(" Slave-->");//首先显示时间和头部信息
-		
-		for(i=0;i<len+2;i++)//原文粘贴数据
+
+		ret = MaskCheckItem(command_word-0x60);
+		//如果指令在屏蔽列表，那么不显示此指令（分析照常进行，仅是不显示了）
+		if( ret<0 )//没有找到屏蔽项
 		{
-			strtemp.Format(_T(" %02X"), rcv_buf[i]);
-			*pstrout+=strtemp;//加入接收编辑框对应字符串型映射变量中
+			for(i=0;i<len+2;i++)//原文粘贴数据
+			{
+				strtemp.Format(_T(" %02X"), rcv_buf[i]);
+				*pstrout+=strtemp;//加入接收编辑框对应字符串型映射变量中
+			}
+			//最后添加换行，完成分析并输出
+			*pstrout+=_T("\r\n");
+			*pstrout+=_T("\r\n");//从机多加一个换行，这样可以分辨出主从机指令的配对情况
 		}
+		else
+		{
+			pstrout->Empty();
+		}
+
 		//此处添加解析数据,暂时忽略
 		//......
 		switch(command_word)
 		{
 			case QUERY_RET://0x82+0x60
-				analysis_slave_query(pcommdata);//处理查询指令的反馈，可以获取系统状态值
+				analysis_slave_query(pcommdata);//处理查询指令的反馈，可以获取系统状态值，横屏可以获取系统坐标值
 				break;
 
 			case COOR_RET://0x89+0x60
@@ -364,14 +404,6 @@ void analysis_protocol(BYTE* pcommdata,CString *pstrout)//解析正确的通信帧并输出
 				break;
 		}
 		correct_slave_pocket_number++;//从机正确解析数+1
-
-
-
-
-		//最后添加换行，完成分析并输出
-		*pstrout+=_T("\r\n");
-		*pstrout+=_T("\r\n");//从机多加一个换行，这样可以分辨出主从机指令的配对情况
+		
 	}
-
-
 }

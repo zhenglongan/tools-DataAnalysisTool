@@ -6,6 +6,9 @@
 #include "DataAnalysisTool.h"
 #include "DataAnalysisToolDlg.h"
 #include "DlgProxy.h"
+#include "DisplayMask.h"
+
+#include "CommandMask.h"//支持显示部分通信指令隐藏
 
 #include "analysis.h"
 #include "EnumSerial.h"//添加串口自动扫描功能
@@ -19,7 +22,12 @@ CircularBuf circular_buf(16*1024);//定义缓存缓冲区，大小为16KB
 BYTE display_buf[16*1024];//用于缓存显示
 CString display_new_line;
 
+
 CArray<SSerInfo,SSerInfo&> asi;
+
+CDisplayMask *p_disp_mask_dlg;//屏蔽设置对话框(非模态)
+
+
 
 
 #define TIMER_READ_PORT_DATA 1
@@ -128,6 +136,7 @@ BEGIN_MESSAGE_MAP(CDataAnalysisToolDlg, CDialog)
 	ON_WM_DEVICECHANGE()
 	ON_CBN_SELCHANGE(IDC_COMBO_PORT, &CDataAnalysisToolDlg::OnCbnSelchangeComboPort)
 	ON_CBN_SELCHANGE(IDC_COMBO_BAUDRATE, &CDataAnalysisToolDlg::OnCbnSelchangeComboBaudrate)
+	ON_COMMAND(ID_32771, &CDataAnalysisToolDlg::On32771)
 END_MESSAGE_MAP()
 
 
@@ -178,7 +187,7 @@ BOOL CDataAnalysisToolDlg::OnInitDialog()
 	//m_ctrlComboCommPort.SetCurSel(5);//串口选择框默认选择COM1
 	//m_nPort=1;//默认选择COM1
 	GetCom();//获取可用串口
-	m_ctrlComboCommBaudRate.SetCurSel(9);//波特率默认选择115200
+	m_ctrlComboCommBaudRate.SetCurSel(8);//波特率默认选择57600
 	//m_ctrlComm.put_CommPort(m_nPort);
 	OpenPortStatus=FALSE;
 	if(m_ctrlComm.get_PortOpen())
@@ -219,9 +228,13 @@ BOOL CDataAnalysisToolDlg::OnInitDialog()
 	display_new_line.Empty();
 	analysis_init(&display_new_line);//初始化协议解析模块
 	refresh_coor(0,0);
+	//创建屏蔽设置对话框，为了方便使用，作为非模态对话框使用，在这里创建
+	p_disp_mask_dlg = new CDisplayMask;
+	MaskLinkInit();//初始化通信命令屏蔽显示链表
+	//p_disp_mask_dlg->Create(IDD_DIALOG_SET_DISPLAY_MASK,this->GetDesktopWindow()); //非模态对话框ID号
 	//↑↑↑↑↑↑↑↑↑↑↑↑↑以下是我们自己添加的程序↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑
 	
-
+ 
 
 
 
@@ -590,6 +603,11 @@ void CDataAnalysisToolDlg::OnTimer(UINT_PTR nIDEvent)
 			{
 				analysis_rcv_FSM(display_buf[i]);//这里将直接输出
 
+				if(display_new_line.IsEmpty()==0)
+				{
+					AutoNextLine(display_new_line);//追加解析内容
+					display_new_line.Empty();//清空临时变量
+				}
 			}
 			
 
@@ -613,11 +631,7 @@ void CDataAnalysisToolDlg::OnTimer(UINT_PTR nIDEvent)
 			m_strEditSlavePacketNumber=_T("从机指令:");
 			m_strEditSlavePacketNumber+=strtemp;
 
-			if(display_new_line.IsEmpty()==0)
-			{
-				AutoNextLine(display_new_line);//追加解析内容
-				display_new_line.Empty();//清空临时变量
-			}
+			
 			//UpdateData(FALSE);//更新编辑框内容，即在接收显示框中显示接收数据
 			UpdateEditDisplay();
 
@@ -1162,14 +1176,17 @@ BOOL CDataAnalysisToolDlg::PreTranslateMessage(MSG* pMsg)
 void CDataAnalysisToolDlg::ProcessSystemStateIcon(SYS_STRU* p_sys)
 {
 	static UINT8 state=1;
+	static UINT16 error=0;
 	DWORD bmp;
 
 	//状态未改变，直接返回，不必更新
-	if(p_sys->status == state)
+	if(p_sys->status == state && p_sys->error == error)
 		return;
 
 
 	state = p_sys->status;
+	error = p_sys->error;
+
 	switch(p_sys->status)
 	{
 		case SYSTEM_STATE_ZOJE_VERTICAL_RESERVE:
@@ -1342,6 +1359,14 @@ void CDataAnalysisToolDlg::ProcessSystemStateIcon(SYS_STRU* p_sys)
 	}
 	//更新图片
 	ShowSystemStatusPicture(bmp);
+	
+	//对于系统报错的处理
+	if(error==0)
+		return;
+
+	CString str;
+	str.LoadStringW(IDS_STRING_ERROR_0+error);
+	MessageBox(str,_T("系统进入错误状态"),MB_ICONSTOP);
 }
 
 // 更新系统当前坐标值的显示
@@ -1363,4 +1388,19 @@ void CDataAnalysisToolDlg::refresh_coor(INT32 x,INT32 y)
 		str.Format(_T("Y:%d"),y);
 		Y_coor.SetWindowTextW(str);
 	}
+}
+
+//菜单->设置->屏蔽设置
+void CDataAnalysisToolDlg::On32771()
+{
+	// TODO: Add your command handler code here
+	//AfxMessageBox(_T("进入设置->屏蔽设置界面"));
+	
+
+	if(p_disp_mask_dlg!=NULL)
+	{
+		p_disp_mask_dlg->DoModal();
+
+	}
+
 }

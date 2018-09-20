@@ -320,7 +320,7 @@ typedef struct
 } SYS_STRU;
 
 extern SYS_STRU sys;//缝纫机的系统状态机状态值
-
+extern CString SYS_ERROR_INFO[200];//错误提示信息
 
 
 void analysis_rcv_FSM(BYTE dat);//解析通信帧

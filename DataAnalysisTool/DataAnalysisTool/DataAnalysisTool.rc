@@ -82,20 +82,20 @@ IDI_ICON2               ICON                    "res\\02_ready.ico"
 
 IDD_ABOUTBOX DIALOGEX 0, 0, 224, 84
 STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
-CAPTION "关于 DataAnalysisTool"
+CAPTION "关于工缝机串口数据监控工具"
 FONT 9, "MS Shell Dlg", 0, 0, 0x1
 BEGIN
     ICON            IDR_MAINFRAME,IDC_STATIC,14,14,20,20
-    LTEXT           "DataAnalysisTool，1.0 版",IDC_STATIC,42,14,114,8,SS_NOPREFIX
+    LTEXT           "工缝机串口数据监控工具，V0.5版 ",IDC_STATIC,42,14,114,8,SS_NOPREFIX
     LTEXT           "Copyright (C) 2018",IDC_STATIC,42,26,114,8
     DEFPUSHBUTTON   "确定",IDOK,167,63,50,14,WS_GROUP
-    LTEXT           "2018-08-01  郑龙安",IDC_STATIC,38,46,126,18
+    LTEXT           "2018-09-20  花样机组 郑龙安",IDC_STATIC,38,46,126,18
 END
 
 IDD_DATAANALYSISTOOL_DIALOG DIALOGEX 0, 0, 491, 268
 STYLE DS_SETFONT | DS_FIXEDSYS | WS_MINIMIZEBOX | WS_MAXIMIZEBOX | WS_POPUP | WS_VISIBLE | WS_CAPTION | WS_SYSMENU | WS_THICKFRAME
 EXSTYLE WS_EX_APPWINDOW
-CAPTION "DataAnalysisTool_V0.3_zla"
+CAPTION "工缝机串口数据监控工具V0.5 花样机组 2018-9-20"
 MENU IDR_MENU1
 FONT 9, "MS Shell Dlg", 0, 0, 0x1
 BEGIN
@@ -116,6 +116,20 @@ BEGIN
     EDITTEXT        IDC_EDIT_Y_COOR,7,129,48,14,ES_AUTOHSCROLL | ES_READONLY | NOT WS_BORDER
 END
 
+IDD_DIALOG_SET_DISPLAY_MASK DIALOGEX 0, 0, 410, 218
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "设置显示屏蔽"
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    DEFPUSHBUTTON   "OK",IDOK,353,197,50,14
+    CONTROL         "",IDC_LIST_MASK_TABLE,"SysListView32",LVS_REPORT | LVS_ALIGNLEFT | WS_BORDER | WS_TABSTOP,7,7,341,204
+    EDITTEXT        IDC_EDIT_ADD_MASK,370,19,25,12,ES_AUTOHSCROLL
+    PUSHBUTTON      "添加屏蔽",IDC_BUTTON_ADD_MASK,358,37,45,15
+    PUSHBUTTON      "取消屏蔽",IDC_BUTTON_REMOVE_MASK,358,58,45,15
+    PUSHBUTTON      "取消所有",IDC_BUTTON_REMOVE_ALL,358,79,45,15
+    LTEXT           "0x",IDC_STATIC,361,21,8,8
+END
+
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -123,8 +137,8 @@ END
 //
 
 VS_VERSION_INFO VERSIONINFO
- FILEVERSION 1,0,0,3
- PRODUCTVERSION 1,0,0,3
+ FILEVERSION 1,0,0,5
+ PRODUCTVERSION 1,0,0,5
  FILEFLAGSMASK 0x3fL
 #ifdef _DEBUG
  FILEFLAGS 0x1L
@@ -141,12 +155,12 @@ BEGIN
         BEGIN
             VALUE "CompanyName", "TODO: <公司名>"
             VALUE "FileDescription", "TODO: <文件说明>"
-            VALUE "FileVersion", "1.0.0.3"
+            VALUE "FileVersion", "1.0.0.5"
             VALUE "InternalName", "DataAnalysisTool.exe"
             VALUE "LegalCopyright", "TODO: (C) <公司名>。保留所有权利。"
             VALUE "OriginalFilename", "DataAnalysisTool.exe"
             VALUE "ProductName", "TODO: <产品名>"
-            VALUE "ProductVersion", "1.0.0.3"
+            VALUE "ProductVersion", "1.0.0.5"
         END
     END
     BLOCK "VarFileInfo"
@@ -181,6 +195,14 @@ BEGIN
         TOPMARGIN, 7
         BOTTOMMARGIN, 261
     END
+
+    IDD_DIALOG_SET_DISPLAY_MASK, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 403
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 211
+    END
 END
 #endif    // APSTUDIO_INVOKED
 
@@ -194,12 +216,16 @@ IDR_MENU1 MENU
 BEGIN
     POPUP "设置"
     BEGIN
-        MENUITEM "设置1",                         ID_32771
+        MENUITEM "屏蔽设置",                        ID_32771
         MENUITEM "设置2",                         ID_32772
     END
     POPUP "关于"
     BEGIN
         MENUITEM "关于",                          ID_about
+    END
+    POPUP "信息"
+    BEGIN
+        MENUITEM "信息1",                         ID_32781
     END
 END
 
@@ -346,6 +372,326 @@ BEGIN
     IDP_OLE_INIT_FAILED     "OLE 初始化失败。请确保 OLE 库是正确的版本。"
     IDS_ABOUTBOX            "关于 DataAnalysisTool(&A)..."
     IDP_SOCKETS_INIT_FAILED "Windows 套接字初始化失败。"
+END
+
+STRINGTABLE 
+BEGIN
+    IDS_STRING_ERROR_0      "错误E-000：无错误"
+    IDS_STRING_ERROR_1      "错误E-001："
+    IDS_STRING_ERROR_2      "错误E-002：机器进入急停状态，请检查急停开关状态，旋转释放急停开关"
+    IDS_STRING_ERROR_3      "错误E-003："
+    IDS_STRING_ERROR_4      "错误E-004：300V母线电压过低"
+    IDS_STRING_ERROR_5      "错误E-005：300V母线电压超压"
+    IDS_STRING_ERROR_6      "错误E-006："
+    IDS_STRING_ERROR_7      "错误E-007：IPM频繁过流"
+    IDS_STRING_ERROR_8      "错误E-008：24V超压"
+    IDS_STRING_ERROR_9      "错误E-009：24V欠压"
+    IDS_STRING_ERROR_10     "错误E-010："
+    IDS_STRING_ERROR_11     "错误E-011："
+    IDS_STRING_ERROR_12     "错误E-012："
+    IDS_STRING_ERROR_13     "错误E-013：电机编码器未连接"
+    IDS_STRING_ERROR_14     "错误E-014："
+    IDS_STRING_ERROR_15     "错误E-015：超出缝制范围"
+END
+
+STRINGTABLE 
+BEGIN
+    IDS_STRING_ERROR_16     "错误E-016："
+    IDS_STRING_ERROR_17     "错误E-017："
+    IDS_STRING_ERROR_18     "错误E-018："
+    IDS_STRING_ERROR_19     "错误E-019：急停开关未在正常位置"
+    IDS_STRING_ERROR_20     "错误E-020："
+    IDS_STRING_ERROR_21     "错误E-021："
+    IDS_STRING_ERROR_22     "错误E-022："
+    IDS_STRING_ERROR_23     "错误E-023："
+    IDS_STRING_ERROR_24     "错误E-024："
+    IDS_STRING_ERROR_25     "错误E-025："
+    IDS_STRING_ERROR_26     "错误E-026："
+    IDS_STRING_ERROR_27     "错误E-027："
+    IDS_STRING_ERROR_28     "错误E-028："
+    IDS_STRING_ERROR_29     "错误E-029："
+    IDS_STRING_ERROR_30     "错误E-030："
+    IDS_STRING_ERROR_31     "错误E-031："
+END
+
+STRINGTABLE 
+BEGIN
+    IDS_STRING_ERROR_32     "错误E-032："
+    IDS_STRING_ERROR_33     "错误E-033："
+    IDS_STRING_ERROR_34     "错误E-034："
+    IDS_STRING_ERROR_35     "错误E-035："
+    IDS_STRING_ERROR_36     "错误E-036："
+    IDS_STRING_ERROR_37     "错误E-037："
+    IDS_STRING_ERROR_38     "错误E-038："
+    IDS_STRING_ERROR_39     "错误E-039："
+    IDS_STRING_ERROR_40     "错误E-040："
+    IDS_STRING_ERROR_41     "错误E-041："
+    IDS_STRING_ERROR_42     "错误E-042："
+    IDS_STRING_ERROR_43     "错误E-043："
+    IDS_STRING_ERROR_44     "错误E-044："
+    IDS_STRING_ERROR_45     "错误E-045：压脚没有落下，请踩压脚踏板或者按下压脚按钮"
+    IDS_STRING_ERROR_46     "错误E-046：不在原点，无法操作，请按回原点键"
+    IDS_STRING_ERROR_47     "错误E-047："
+END
+
+STRINGTABLE 
+BEGIN
+    IDS_STRING_ERROR_48     "错误E-048：气阀气压异常"
+    IDS_STRING_ERROR_49     "错误E-049："
+    IDS_STRING_ERROR_50     "错误E-050："
+    IDS_STRING_ERROR_51     "错误E-051："
+    IDS_STRING_ERROR_52     "错误E-052："
+    IDS_STRING_ERROR_53     "错误E-053："
+    IDS_STRING_ERROR_54     "错误E-054："
+    IDS_STRING_ERROR_55     "错误E-055："
+    IDS_STRING_ERROR_56     "错误E-056："
+    IDS_STRING_ERROR_57     "错误E-057："
+    IDS_STRING_ERROR_58     "错误E-058："
+    IDS_STRING_ERROR_59     "错误E-059："
+    IDS_STRING_ERROR_60     "错误E-060："
+    IDS_STRING_ERROR_61     "错误E-061："
+    IDS_STRING_ERROR_62     "错误E-062："
+    IDS_STRING_ERROR_63     "错误E-063："
+END
+
+STRINGTABLE 
+BEGIN
+    IDS_STRING_ERROR_64     "错误E-064："
+    IDS_STRING_ERROR_65     "错误E-065："
+    IDS_STRING_ERROR_66     "错误E-066："
+    IDS_STRING_ERROR_67     "错误E-067："
+    IDS_STRING_ERROR_68     "错误E-068："
+    IDS_STRING_ERROR_69     "错误E-069："
+    IDS_STRING_ERROR_70     "错误E-070："
+    IDS_STRING_ERROR_71     "错误E-071："
+    IDS_STRING_ERROR_72     "错误E-072："
+    IDS_STRING_ERROR_73     "错误E-073："
+    IDS_STRING_ERROR_74     "错误E-074："
+    IDS_STRING_ERROR_75     "错误E-075："
+    IDS_STRING_ERROR_76     "错误E-076："
+    IDS_STRING_ERROR_77     "错误E-077："
+    IDS_STRING_ERROR_78     "错误E-078："
+    IDS_STRING_ERROR_79     "错误E-079："
+END
+
+STRINGTABLE 
+BEGIN
+    IDS_STRING_ERROR_80     "错误E-080："
+    IDS_STRING_ERROR_81     "错误E-081："
+    IDS_STRING_ERROR_82     "错误E-082："
+    IDS_STRING_ERROR_83     "错误E-083："
+    IDS_STRING_ERROR_84     "错误E-084："
+    IDS_STRING_ERROR_85     "错误E-085："
+    IDS_STRING_ERROR_86     "错误E-086："
+    IDS_STRING_ERROR_87     "错误E-087："
+    IDS_STRING_ERROR_88     "错误E-088："
+    IDS_STRING_ERROR_89     "错误E-089："
+    IDS_STRING_ERROR_90     "错误E-090："
+    IDS_STRING_ERROR_91     "错误E-091："
+    IDS_STRING_ERROR_92     "错误E-092："
+    IDS_STRING_ERROR_93     "错误E-093："
+    IDS_STRING_ERROR_94     "错误E-094："
+    IDS_STRING_ERROR_95     "错误E-095："
+END
+
+STRINGTABLE 
+BEGIN
+    IDS_STRING_ERROR_96     "错误E-096："
+    IDS_STRING_ERROR_97     "错误E-097："
+    IDS_STRING_ERROR_98     "错误E-098："
+    IDS_STRING_ERROR_99     "错误E-099："
+    IDS_STRING_ERROR_100    "错误E-100：竖屏暂时没有使用此错误代码"
+    IDS_STRING_ERROR_101    "错误E-101：竖屏暂时没有使用此错误代码"
+    IDS_STRING_ERROR_102    "错误E-102：竖屏暂时没有使用此错误代码"
+    IDS_STRING_ERROR_103    "错误E-103：竖屏暂时没有使用此错误代码"
+    IDS_STRING_ERROR_104    "错误E-104：竖屏暂时没有使用此错误代码"
+    IDS_STRING_ERROR_105    "错误E-105：竖屏暂时没有使用此错误代码"
+    IDS_STRING_ERROR_106    "错误E-106：竖屏暂时没有使用此错误代码"
+    IDS_STRING_ERROR_107    "错误E-107：竖屏暂时没有使用此错误代码"
+    IDS_STRING_ERROR_108    "错误E-108：竖屏暂时没有使用此错误代码"
+    IDS_STRING_ERROR_109    "错误E-109：竖屏暂时没有使用此错误代码"
+    IDS_STRING_ERROR_110    "错误E-110：竖屏暂时没有使用此错误代码"
+    IDS_STRING_ERROR_111    "错误E-111：竖屏暂时没有使用此错误代码"
+END
+
+STRINGTABLE 
+BEGIN
+    IDS_STRING_ERROR_112    "错误E-112：竖屏暂时没有使用此错误代码"
+    IDS_STRING_ERROR_113    "错误E-113：竖屏暂时没有使用此错误代码"
+    IDS_STRING_ERROR_114    "错误E-114：竖屏暂时没有使用此错误代码"
+    IDS_STRING_ERROR_115    "错误E-115：竖屏暂时没有使用此错误代码"
+    IDS_STRING_ERROR_116    "错误E-116：竖屏暂时没有使用此错误代码"
+    IDS_STRING_ERROR_117    "错误E-117：竖屏暂时没有使用此错误代码"
+    IDS_STRING_ERROR_118    "错误E-118：竖屏暂时没有使用此错误代码"
+    IDS_STRING_ERROR_119    "错误E-119：竖屏暂时没有使用此错误代码"
+    IDS_STRING_ERROR_120    "错误E-120：竖屏暂时没有使用此错误代码"
+    IDS_STRING_ERROR_121    "错误E-121：竖屏暂时没有使用此错误代码"
+    IDS_STRING_ERROR_122    "错误E-122：竖屏暂时没有使用此错误代码"
+    IDS_STRING_ERROR_123    "错误E-123：竖屏暂时没有使用此错误代码"
+    IDS_STRING_ERROR_124    "错误E-124：竖屏暂时没有使用此错误代码"
+    IDS_STRING_ERROR_125    "错误E-125：竖屏暂时没有使用此错误代码"
+    IDS_STRING_ERROR_126    "错误E-126：竖屏暂时没有使用此错误代码"
+    IDS_STRING_ERROR_127    "错误E-127：竖屏暂时没有使用此错误代码"
+END
+
+STRINGTABLE 
+BEGIN
+    IDS_STRING_ERROR_128    "错误E-128：竖屏暂时没有使用此错误代码"
+    IDS_STRING_ERROR_129    "错误E-129：竖屏暂时没有使用此错误代码"
+    IDS_STRING_ERROR_130    "错误E-130：竖屏暂时没有使用此错误代码"
+    IDS_STRING_ERROR_131    "错误E-131：竖屏暂时没有使用此错误代码"
+    IDS_STRING_ERROR_132    "错误E-132：竖屏暂时没有使用此错误代码"
+    IDS_STRING_ERROR_133    "错误E-133：竖屏暂时没有使用此错误代码"
+    IDS_STRING_ERROR_134    "错误E-134：竖屏暂时没有使用此错误代码"
+    IDS_STRING_ERROR_135    "错误E-135：竖屏暂时没有使用此错误代码"
+    IDS_STRING_ERROR_136    "错误E-136：竖屏暂时没有使用此错误代码"
+    IDS_STRING_ERROR_137    "错误E-137：竖屏暂时没有使用此错误代码"
+    IDS_STRING_ERROR_138    "错误E-138：竖屏暂时没有使用此错误代码"
+    IDS_STRING_ERROR_139    "错误E-139：竖屏暂时没有使用此错误代码"
+    IDS_STRING_ERROR_140    "错误E-140：竖屏暂时没有使用此错误代码"
+    IDS_STRING_ERROR_141    "错误E-141：竖屏暂时没有使用此错误代码"
+    IDS_STRING_ERROR_142    "错误E-142：竖屏暂时没有使用此错误代码"
+    IDS_STRING_ERROR_143    "错误E-143：竖屏暂时没有使用此错误代码"
+END
+
+STRINGTABLE 
+BEGIN
+    IDS_STRING_ERROR_144    "错误E-144：竖屏暂时没有使用此错误代码"
+    IDS_STRING_ERROR_145    "错误E-145：竖屏暂时没有使用此错误代码"
+    IDS_STRING_ERROR_146    "错误E-146：竖屏暂时没有使用此错误代码"
+    IDS_STRING_ERROR_147    "错误E-147：竖屏暂时没有使用此错误代码"
+    IDS_STRING_ERROR_148    "错误E-148：竖屏暂时没有使用此错误代码"
+    IDS_STRING_ERROR_149    "错误E-149：竖屏暂时没有使用此错误代码"
+    IDS_STRING_ERROR_150    "错误E-150：竖屏暂时没有使用此错误代码"
+    IDS_STRING_ERROR_151    "错误E-151：竖屏暂时没有使用此错误代码"
+    IDS_STRING_ERROR_152    "错误E-152：竖屏暂时没有使用此错误代码"
+    IDS_STRING_ERROR_153    "错误E-153：竖屏暂时没有使用此错误代码"
+    IDS_STRING_ERROR_154    "错误E-154：竖屏暂时没有使用此错误代码"
+    IDS_STRING_ERROR_155    "错误E-155：竖屏暂时没有使用此错误代码"
+    IDS_STRING_ERROR_156    "错误E-156：竖屏暂时没有使用此错误代码"
+    IDS_STRING_ERROR_157    "错误E-157：竖屏暂时没有使用此错误代码"
+    IDS_STRING_ERROR_158    "错误E-158：竖屏暂时没有使用此错误代码"
+    IDS_STRING_ERROR_159    "错误E-159：竖屏暂时没有使用此错误代码"
+END
+
+STRINGTABLE 
+BEGIN
+    IDS_STRING_ERROR_160    "错误E-160：竖屏暂时没有使用此错误代码"
+    IDS_STRING_ERROR_161    "错误E-161：竖屏暂时没有使用此错误代码"
+    IDS_STRING_ERROR_162    "错误E-162：竖屏暂时没有使用此错误代码"
+    IDS_STRING_ERROR_163    "错误E-163：竖屏暂时没有使用此错误代码"
+    IDS_STRING_ERROR_164    "错误E-164：竖屏暂时没有使用此错误代码"
+    IDS_STRING_ERROR_165    "错误E-165：竖屏暂时没有使用此错误代码"
+    IDS_STRING_ERROR_166    "错误E-166：竖屏暂时没有使用此错误代码"
+    IDS_STRING_ERROR_167    "错误E-167：竖屏暂时没有使用此错误代码"
+    IDS_STRING_ERROR_168    "错误E-168：竖屏暂时没有使用此错误代码"
+    IDS_STRING_ERROR_169    "错误E-169：竖屏暂时没有使用此错误代码"
+    IDS_STRING_ERROR_170    "错误E-170：竖屏暂时没有使用此错误代码"
+    IDS_STRING_ERROR_171    "错误E-171：竖屏暂时没有使用此错误代码"
+    IDS_STRING_ERROR_172    "错误E-172：竖屏暂时没有使用此错误代码"
+    IDS_STRING_ERROR_173    "错误E-173：竖屏暂时没有使用此错误代码"
+    IDS_STRING_ERROR_174    "错误E-174：竖屏暂时没有使用此错误代码"
+    IDS_STRING_ERROR_175    "错误E-175：竖屏暂时没有使用此错误代码"
+END
+
+STRINGTABLE 
+BEGIN
+    IDS_STRING_ERROR_176    "错误E-176：竖屏暂时没有使用此错误代码"
+    IDS_STRING_ERROR_177    "错误E-177：竖屏暂时没有使用此错误代码"
+    IDS_STRING_ERROR_178    "错误E-178：竖屏暂时没有使用此错误代码"
+    IDS_STRING_ERROR_179    "错误E-179：竖屏暂时没有使用此错误代码"
+    IDS_STRING_ERROR_180    "错误E-180：竖屏暂时没有使用此错误代码"
+    IDS_STRING_ERROR_181    "错误E-181：竖屏暂时没有使用此错误代码"
+    IDS_STRING_ERROR_182    "错误E-182：竖屏暂时没有使用此错误代码"
+    IDS_STRING_ERROR_183    "错误E-183：竖屏暂时没有使用此错误代码"
+    IDS_STRING_ERROR_184    "错误E-184：竖屏暂时没有使用此错误代码"
+    IDS_STRING_ERROR_185    "错误E-185：竖屏暂时没有使用此错误代码"
+    IDS_STRING_ERROR_186    "错误E-186：竖屏暂时没有使用此错误代码"
+    IDS_STRING_ERROR_187    "错误E-187：竖屏暂时没有使用此错误代码"
+    IDS_STRING_ERROR_188    "错误E-188：竖屏暂时没有使用此错误代码"
+    IDS_STRING_ERROR_189    "错误E-189：竖屏暂时没有使用此错误代码"
+    IDS_STRING_ERROR_190    "错误E-190：竖屏暂时没有使用此错误代码"
+    IDS_STRING_ERROR_191    "错误E-191：竖屏暂时没有使用此错误代码"
+END
+
+STRINGTABLE 
+BEGIN
+    IDS_STRING_ERROR_192    "错误E-192：竖屏暂时没有使用此错误代码"
+    IDS_STRING_ERROR_193    "错误E-193：竖屏暂时没有使用此错误代码"
+    IDS_STRING_ERROR_194    "错误E-194：竖屏暂时没有使用此错误代码"
+    IDS_STRING_ERROR_195    "错误E-195：竖屏暂时没有使用此错误代码"
+    IDS_STRING_ERROR_196    "错误E-196：竖屏暂时没有使用此错误代码"
+    IDS_STRING_ERROR_197    "错误E-197：竖屏暂时没有使用此错误代码"
+    IDS_STRING_ERROR_198    "错误E-198：竖屏暂时没有使用此错误代码"
+    IDS_STRING_ERROR_199    "错误E-199：竖屏暂时没有使用此错误代码"
+    IDS_STRING_ERROR_200    "错误E-200：竖屏暂时没有使用此错误代码"
+    IDS_STRING_ERROR_201    "错误E-201：竖屏暂时没有使用此错误代码"
+    IDS_STRING_ERROR_202    "错误E-202：竖屏暂时没有使用此错误代码"
+    IDS_STRING_ERROR_203    "错误E-203：竖屏暂时没有使用此错误代码"
+    IDS_STRING_ERROR_204    "错误E-204：竖屏暂时没有使用此错误代码"
+    IDS_STRING_ERROR_205    "错误E-205：竖屏暂时没有使用此错误代码"
+    IDS_STRING_ERROR_206    "错误E-206：竖屏暂时没有使用此错误代码"
+    IDS_STRING_ERROR_207    "错误E-207：竖屏暂时没有使用此错误代码"
+END
+
+STRINGTABLE 
+BEGIN
+    IDS_STRING_ERROR_208    "错误E-208：竖屏暂时没有使用此错误代码"
+    IDS_STRING_ERROR_209    "错误E-209：竖屏暂时没有使用此错误代码"
+    IDS_STRING_ERROR_210    "错误E-210：竖屏暂时没有使用此错误代码"
+    IDS_STRING_ERROR_211    "错误E-211：竖屏暂时没有使用此错误代码"
+    IDS_STRING_ERROR_212    "错误E-212：竖屏暂时没有使用此错误代码"
+    IDS_STRING_ERROR_213    "错误E-213：竖屏暂时没有使用此错误代码"
+    IDS_STRING_ERROR_214    "错误E-214：竖屏暂时没有使用此错误代码"
+    IDS_STRING_ERROR_215    "错误E-215：竖屏暂时没有使用此错误代码"
+    IDS_STRING_ERROR_216    "错误E-216：竖屏暂时没有使用此错误代码"
+    IDS_STRING_ERROR_217    "错误E-217：竖屏暂时没有使用此错误代码"
+    IDS_STRING_ERROR_218    "错误E-218：竖屏暂时没有使用此错误代码"
+    IDS_STRING_ERROR_219    "错误E-219：竖屏暂时没有使用此错误代码"
+    IDS_STRING_ERROR_220    "错误E-220：竖屏暂时没有使用此错误代码"
+    IDS_STRING_ERROR_221    "错误E-221：竖屏暂时没有使用此错误代码"
+    IDS_STRING_ERROR_222    "错误E-222：竖屏暂时没有使用此错误代码"
+    IDS_STRING_ERROR_223    "错误E-223：竖屏暂时没有使用此错误代码"
+END
+
+STRINGTABLE 
+BEGIN
+    IDS_STRING_ERROR_224    "错误E-224：竖屏暂时没有使用此错误代码"
+    IDS_STRING_ERROR_225    "错误E-225：竖屏暂时没有使用此错误代码"
+    IDS_STRING_ERROR_226    "错误E-226：竖屏暂时没有使用此错误代码"
+    IDS_STRING_ERROR_227    "错误E-227：竖屏暂时没有使用此错误代码"
+    IDS_STRING_ERROR_228    "错误E-228：竖屏暂时没有使用此错误代码"
+    IDS_STRING_ERROR_229    "错误E-229：竖屏暂时没有使用此错误代码"
+    IDS_STRING_ERROR_230    "错误E-230：竖屏暂时没有使用此错误代码"
+    IDS_STRING_ERROR_231    "错误E-231：竖屏暂时没有使用此错误代码"
+    IDS_STRING_ERROR_232    "错误E-232：竖屏暂时没有使用此错误代码"
+    IDS_STRING_ERROR_233    "错误E-233：竖屏暂时没有使用此错误代码"
+    IDS_STRING_ERROR_234    "错误E-234：竖屏暂时没有使用此错误代码"
+    IDS_STRING_ERROR_235    "错误E-235：竖屏暂时没有使用此错误代码"
+    IDS_STRING_ERROR_236    "错误E-236：竖屏暂时没有使用此错误代码"
+    IDS_STRING_ERROR_237    "错误E-237：竖屏暂时没有使用此错误代码"
+    IDS_STRING_ERROR_238    "错误E-238：竖屏暂时没有使用此错误代码"
+    IDS_STRING_ERROR_239    "错误E-239：竖屏暂时没有使用此错误代码"
+END
+
+STRINGTABLE 
+BEGIN
+    IDS_STRING_ERROR_240    "错误E-240：竖屏暂时没有使用此错误代码"
+    IDS_STRING_ERROR_241    "错误E-241：竖屏暂时没有使用此错误代码"
+    IDS_STRING_ERROR_242    "错误E-242：竖屏暂时没有使用此错误代码"
+    IDS_STRING_ERROR_243    "错误E-243：竖屏暂时没有使用此错误代码"
+    IDS_STRING_ERROR_244    "错误E-244：竖屏暂时没有使用此错误代码"
+    IDS_STRING_ERROR_245    "错误E-245：竖屏暂时没有使用此错误代码"
+    IDS_STRING_ERROR_246    "错误E-246：竖屏暂时没有使用此错误代码"
+    IDS_STRING_ERROR_247    "错误E-247：竖屏暂时没有使用此错误代码"
+    IDS_STRING_ERROR_248    "错误E-248：竖屏暂时没有使用此错误代码"
+    IDS_STRING_ERROR_249    "错误E-249：竖屏暂时没有使用此错误代码"
+    IDS_STRING_ERROR_250    "错误E-250：竖屏暂时没有使用此错误代码"
+    IDS_STRING_ERROR_251    "错误E-251：竖屏暂时没有使用此错误代码"
+    IDS_STRING_ERROR_252    "错误E-252：竖屏暂时没有使用此错误代码"
+    IDS_STRING_ERROR_253    "错误E-253：竖屏暂时没有使用此错误代码"
+    IDS_STRING_ERROR_254    "错误E-254：竖屏暂时没有使用此错误代码"
+    IDS_STRING_ERROR_255    "错误E-255：竖屏暂时没有使用此错误代码"
 END
 
 #endif    // Chinese (P.R.C.) resources

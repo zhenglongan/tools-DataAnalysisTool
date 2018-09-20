@@ -199,6 +199,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\CommandMask.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\DataAnalysisTool.cpp"
 				>
 			</File>
@@ -208,6 +212,10 @@
 			</File>
 			<File
 				RelativePath=".\DataAnalysisToolDlg.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\DisplayMask.cpp"
 				>
 			</File>
 			<File
@@ -247,6 +255,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\XListCtrl.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\zhongjie_mbj_info.cpp"
 				>
 			</File>
@@ -261,11 +273,23 @@
 				>
 			</File>
 			<File
+				RelativePath=".\CommandMask.h"
+				>
+			</File>
+			<File
+				RelativePath=".\common.h"
+				>
+			</File>
+			<File
 				RelativePath=".\DataAnalysisTool.h"
 				>
 			</File>
 			<File
 				RelativePath=".\DataAnalysisToolDlg.h"
+				>
+			</File>
+			<File
+				RelativePath=".\DisplayMask.h"
 				>
 			</File>
 			<File
@@ -294,6 +318,10 @@
 			</File>
 			<File
 				RelativePath=".\tools.h"
+				>
+			</File>
+			<File
+				RelativePath=".\XListCtrl.h"
 				>
 			</File>
 			<File

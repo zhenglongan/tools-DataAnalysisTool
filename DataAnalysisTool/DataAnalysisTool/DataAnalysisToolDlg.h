@@ -104,4 +104,5 @@ public:
 	CEdit Y_coor;
 	// 更新系统当前坐标值的显示
 	void refresh_coor(INT32 x,INT32 y);
+	afx_msg void On32771();
 };
