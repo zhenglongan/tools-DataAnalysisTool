@@ -103,7 +103,7 @@
 			OutputDirectory="$(SolutionDir)$(ConfigurationName)"
 			IntermediateDirectory="$(ConfigurationName)"
 			ConfigurationType="1"
-			UseOfMFC="1"
+			UseOfMFC="2"
 			CharacterSet="1"
 			WholeProgramOptimization="1"
 			>
@@ -132,7 +132,7 @@
 				EnableIntrinsicFunctions="true"
 				PreprocessorDefinitions="WIN32;_WINDOWS;NDEBUG"
 				MinimalRebuild="false"
-				RuntimeLibrary="0"
+				RuntimeLibrary="2"
 				EnableFunctionLevelLinking="true"
 				UsePrecompiledHeader="2"
 				WarningLevel="3"
@@ -230,6 +230,34 @@
 				>
 			</File>
 			<File
+				RelativePath=".\fg_tab1.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\fg_tab2.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\fg_tab3.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\fg_tab4.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\fg_tab5.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\fg_tab6.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\fg_tab7.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\mscomm1.cpp"
 				>
 			</File>
@@ -255,6 +283,14 @@
 			</File>
 			<File
 				RelativePath=".\tools.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\uk_cfg.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\UKCfgInformationDlg.cpp"
 				>
 			</File>
 			<File
@@ -304,6 +340,34 @@
 				>
 			</File>
 			<File
+				RelativePath=".\fg_tab1.h"
+				>
+			</File>
+			<File
+				RelativePath=".\fg_tab2.h"
+				>
+			</File>
+			<File
+				RelativePath=".\fg_tab3.h"
+				>
+			</File>
+			<File
+				RelativePath=".\fg_tab4.h"
+				>
+			</File>
+			<File
+				RelativePath=".\fg_tab5.h"
+				>
+			</File>
+			<File
+				RelativePath=".\fg_tab6.h"
+				>
+			</File>
+			<File
+				RelativePath=".\fg_tab7.h"
+				>
+			</File>
+			<File
 				RelativePath=".\mscomm1.h"
 				>
 			</File>
@@ -321,6 +385,14 @@
 			</File>
 			<File
 				RelativePath=".\tools.h"
+				>
+			</File>
+			<File
+				RelativePath=".\uk_cfg.h"
+				>
+			</File>
+			<File
+				RelativePath=".\UKCfgInformationDlg.h"
 				>
 			</File>
 			<File
