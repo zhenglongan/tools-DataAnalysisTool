@@ -156,6 +156,7 @@
 				LinkLibraryDependencies="true"
 				AdditionalDependencies="setupapi.lib"
 				LinkIncremental="1"
+				GenerateManifest="true"
 				GenerateDebugInformation="true"
 				SubSystem="2"
 				OptimizeReferences="2"
