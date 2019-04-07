@@ -291,6 +291,14 @@
 				>
 			</File>
 			<File
+				RelativePath=".\RealTimeMonitorInfo.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\RealTimeMonitorInfoDlg.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\stdafx.cpp"
 				>
 				<FileConfiguration
@@ -426,6 +434,14 @@
 			</File>
 			<File
 				RelativePath=".\mscomm1.h"
+				>
+			</File>
+			<File
+				RelativePath=".\RealTimeMonitorInfo.h"
+				>
+			</File>
+			<File
+				RelativePath=".\RealTimeMonitorInfoDlg.h"
 				>
 			</File>
 			<File
@@ -673,6 +689,11 @@
 		</File>
 		<File
 			RelativePath=".\ReadMe.txt"
+			>
+		</File>
+		<File
+			RelativePath=".\RealTimeMonitorInfoDlg.htm"
+			DeploymentContent="true"
 			>
 		</File>
 	</Files>
