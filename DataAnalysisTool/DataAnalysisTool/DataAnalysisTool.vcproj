@@ -291,6 +291,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\MyExcel.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\RealTimeMonitorInfo.cpp"
 				>
 			</File>
@@ -345,7 +349,19 @@
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
 			>
 			<File
+				RelativePath=".\CApplication.h"
+				>
+			</File>
+			<File
+				RelativePath=".\CFont0.h"
+				>
+			</File>
+			<File
 				RelativePath=".\CircularBuf.h"
+				>
+			</File>
+			<File
+				RelativePath=".\Cnterior.h"
 				>
 			</File>
 			<File
@@ -354,6 +370,26 @@
 			</File>
 			<File
 				RelativePath=".\common.h"
+				>
+			</File>
+			<File
+				RelativePath=".\CRange.h"
+				>
+			</File>
+			<File
+				RelativePath=".\CWorkbook.h"
+				>
+			</File>
+			<File
+				RelativePath=".\CWorkbooks.h"
+				>
+			</File>
+			<File
+				RelativePath=".\CWorksheet.h"
+				>
+			</File>
+			<File
+				RelativePath=".\CWorksheets.h"
 				>
 			</File>
 			<File
@@ -434,6 +470,10 @@
 			</File>
 			<File
 				RelativePath=".\mscomm1.h"
+				>
+			</File>
+			<File
+				RelativePath=".\MyExcel.h"
 				>
 			</File>
 			<File
